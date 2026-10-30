@@ -27,12 +27,40 @@
             border-bottom: 1px solid #e2e8f0;
         }
         .nav-inner { display: flex; justify-content: space-between; align-items: center; height: 70px; }
-        .logo { font-size: 1.5rem; font-weight: 800; color: var(--primary); text-decoration: none; letter-spacing: -0.5px; }
+        
+        /* Стили для логотипа в шапке (с закруглением) */
+        .logo { display: flex; align-items: center; text-decoration: none; }
+        .logo img { 
+            height: 42px; 
+            width: auto; 
+            border-radius: 8px; /* Легкое закругление в шапке */
+            object-fit: cover;
+        }
+
         .nav-links a { text-decoration: none; color: var(--dark); margin-left: 25px; font-weight: 500; transition: 0.3s; font-size: 0.95rem; }
         .nav-links a:hover { color: var(--primary); }
 
         /* Главный экран */
-        .hero { padding: 100px 0; text-align: center; }
+        .hero { padding: 80px 0 100px; text-align: center; }
+        
+        /* Стили для большого логотипа на главном экране */
+        .hero-logo-wrapper {
+            background: var(--white);
+            display: inline-block;
+            padding: 20px;
+            border-radius: 24px; /* Красивое закругление */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); /* Мягкая тень */
+            margin-bottom: 30px;
+            border: 1px solid #e2e8f0;
+        }
+        .hero-logo-wrapper img {
+            height: 90px;
+            width: auto;
+            display: block;
+            border-radius: 12px; /* Закругление самой картинки внутри карточки */
+            object-fit: cover;
+        }
+
         .hero h1 { font-size: 3.5rem; font-weight: 800; margin-bottom: 20px; letter-spacing: -1.5px; line-height: 1.1; }
         .hero p { font-size: 1.2rem; color: var(--gray); max-width: 650px; margin: 0 auto 40px; }
         .btn {
@@ -87,7 +115,6 @@
         .partner-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 15px 30px rgba(0,0,0,0.08); }
         .partner-img {
             height: 160px;
-            background: linear-gradient(135deg, #cbd5e1, #94a3b8);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -123,7 +150,9 @@
     <!-- Меню -->
     <nav>
         <div class="container nav-inner">
-            <a href="#" class="logo">QuickTap</a>
+            <a href="#" class="logo">
+                <img src="logo.png" alt="QuickTap">
+            </a>
             <div class="nav-links">
                 <a href="#about">О нас</a>
                 <a href="#services">Услуги</a>
@@ -135,6 +164,12 @@
 
     <!-- Главный экран -->
     <div class="hero container">
+        
+        <!-- БОЛЬШОЙ ЛОГОТИП С ЗАКРУГЛЕНИЕМ -->
+        <div class="hero-logo-wrapper">
+            <img src="logo.png" alt="QuickTap">
+        </div>
+
         <h1>Современные NFC-решения<br>для вашего бизнеса</h1>
         <p>Мы создаем умные карты с индивидуальным дизайном. Один тап телефоном — и ваш клиент получает доступ ко всем вашим соцсетям, контактам и услугам.</p>
         <a href="#contact" class="btn">Заказать карту</a>
@@ -191,18 +226,17 @@
             
             <div class="grid-3">
                 
-                <!-- КАРТОЧКА ПАРТНЕРА 1 (House Beauty) -->
-                <a href="/housebeaty/" class="partner-card">
-                    <div class="partner-img" style="background: linear-gradient(135deg, #fbcfe8, #f472b6);">✂️</div>
+                <!-- ПАРТНЁР: Lili Mo'tea -->
+                <a href="/lilimotea/" class="partner-card">
+                    <div class="partner-img" style="background: linear-gradient(135deg, #e0aaff, #9d4edd);">🧋</div>
                     <div class="partner-info">
-                        <h3>House Beauty</h3>
-                        <p>Салон красоты премиум-класса</p>
+                        <h3>Lili Mo'tea</h3>
+                        <p>Свежий бабл-ти и авторские напитки</p>
                         <div class="partner-link">Посмотреть страницу <span>→</span></div>
                     </div>
                 </a>
 
-                <!-- КАРТОЧКА ДЛЯ БУДУЩЕГО ПАРТНЁРА (Шаблон) -->
-                <!-- Чтобы добавить нового, просто раскомментируйте этот блок и поменяйте данные -->
+                <!-- Шаблон для следующего партнера -->
                 <!--
                 <a href="/coffeemania/" class="partner-card">
                     <div class="partner-img" style="background: linear-gradient(135deg, #fde68a, #f59e0b);">☕</div>
