@@ -45,21 +45,16 @@
         
         /* Стили для большого логотипа на главном экране */
         .hero-logo-wrapper {
-            background: var(--white);
-            display: inline-block;
-            padding: 20px;
-            border-radius: 24px; /* Красивое закругление */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08); /* Мягкая тень */
-            margin-bottom: 30px;
-            border: 1px solid #e2e8f0;
-        }
-        .hero-logo-wrapper img {
-            height: 140px;
-            width: auto;
-            display: block;
-            border-radius: 12px; /* Закругление самой картинки внутри карточки */
-            object-fit: cover;
-        }
+    display: inline-block;
+    margin-bottom: 30px;
+    /* Весь фон, тени, рамки и отступы убраны */
+}
+.hero-logo-wrapper img {
+    height: 130px; /* Размер логотипа (можете подогнать под себя) */
+    width: auto;
+    display: block;
+    /* Убрали border-radius, чтобы углы картинки не скруглялись */
+}
 
         .hero h1 { font-size: 3.5rem; font-weight: 800; margin-bottom: 20px; letter-spacing: -1.5px; line-height: 1.1; }
         .hero p { font-size: 1.2rem; color: var(--gray); max-width: 650px; margin: 0 auto 40px; }
