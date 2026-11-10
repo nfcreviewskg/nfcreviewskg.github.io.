@@ -17,7 +17,6 @@
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background-color: var(--bg);
-            /* Легкий паттерн из пузырьков бабл-ти */
             background-image: radial-gradient(rgba(245, 130, 32, 0.1) 2px, transparent 2px);
             background-size: 25px 25px;
             color: var(--text);
@@ -59,7 +58,9 @@
         }
 
         h1 { font-size: 2rem; margin: 0 0 5px 0; font-weight: 900; color: var(--brand-orange); letter-spacing: -0.5px; }
-        .description { font-size: 0.95rem; opacity: 0.8; margin: 0; font-weight: 500; color: #555; }
+        /* Стиль для описания и адреса */
+        .description { font-size: 0.95rem; opacity: 0.8; margin: 0 0 5px 0; font-weight: 500; color: #555; }
+        .address { font-size: 0.85rem; color: #888; font-weight: 500; }
         
         /* --- БОЛЬШАЯ КНОПКА ОТЗЫВА --- */
         .review-box {
@@ -127,17 +128,17 @@
 
     <div class="profile">
         <div class="logo-wrapper">
-            <!-- ЛОГОТИП -->
             <img src="lilimotea-icon.jpg" alt="Lili Mo'tea">
         </div>
         <h1>Lili Mo'tea</h1>
         <p class="description">Свежий бабл-ти и авторские напитки</p>
+        <!-- ДОБАВИЛИ АДРЕС -->
+        <p class="address">📍 Микрорайон Асанбай, 52/3</p>
     </div>
 
     <!-- БОЛЬШАЯ КНОПКА ОТЗЫВА -->
     <div class="review-box">
         <a href="https://2gis.kg/bishkek/geo/70000001092863841/tab/reviews" class="btn-review-main" target="_blank">
-            <!-- ИКОНКА 2ГИС -->
             <img src="2gis-icon.png" alt="2ГИС"> 
             Оставить отзыв
         </a>
@@ -149,21 +150,18 @@
         
         <!-- ИНСТАГРАМ -->
         <a href="https://instagram.com/lili_mo_tea" class="link-btn" target="_blank">
-            <!-- ИКОНКА ИНСТАГРАМ -->
             <img src="inst-icon.png" alt="Instagram" class="icon-img"> 
             Мы в Instagram
         </a>
 
         <!-- 2ГИС МАРШРУТ -->
         <a href="https://2gis.kg/bishkek/geo/70000001092863841" class="link-btn" target="_blank">
-            <!-- ИКОНКА 2ГИС -->
             <img src="2gis-icon.png" alt="2ГИС" class="icon-img"> 
             Как нас найти (2ГИС)
         </a>
 
         <!-- ТЕЛЕФОН -->
         <a href="tel:+996504552355" class="link-btn">
-            <!-- Иконка телефона (пока эмодзи) -->
             <span class="icon-img" style="display:flex; justify-content:center; align-items:center; font-size: 1.5rem; background: #f0f0f0;">📞</span> 
             Позвонить нам
         </a>
@@ -175,4 +173,4 @@
     </div>
 
 </body>
-    </html>
+</html>
