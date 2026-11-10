@@ -58,9 +58,21 @@
         }
 
         h1 { font-size: 2rem; margin: 0 0 5px 0; font-weight: 900; color: var(--brand-orange); letter-spacing: -0.5px; }
-        /* Стиль для описания и адреса */
-        .description { font-size: 0.95rem; opacity: 0.8; margin: 0 0 5px 0; font-weight: 500; color: #555; }
-        .address { font-size: 0.85rem; color: #888; font-weight: 500; }
+        
+        .description { font-size: 0.95rem; opacity: 0.8; margin: 0 0 8px 0; font-weight: 500; color: #555; }
+        .address { font-size: 0.85rem; color: #888; font-weight: 500; margin-bottom: 5px; }
+        
+        /* Стиль для номера под адресом */
+        .phone-text {
+            display: block;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--brand-orange);
+            text-decoration: none;
+            margin-top: 5px;
+            transition: 0.3s;
+        }
+        .phone-text:hover { color: var(--brand-orange-dark); }
         
         /* --- БОЛЬШАЯ КНОПКА ОТЗЫВА --- */
         .review-box {
@@ -132,8 +144,11 @@
         </div>
         <h1>Lili Mo'tea</h1>
         <p class="description">Свежий бабл-ти и авторские напитки</p>
-        <!-- ДОБАВИЛИ АДРЕС -->
+        
+        <!-- АДРЕС -->
         <p class="address">📍 Микрорайон Асанбай, 52/3</p>
+        <!-- НОМЕР ТЕЛЕФОНА (сделал ссылкой для звонка) -->
+        <a href="tel:+996504552355" class="phone-text">📞 +996 504 552 355</a>
     </div>
 
     <!-- БОЛЬШАЯ КНОПКА ОТЗЫВА -->
