@@ -6,16 +6,19 @@
     <title>Lili Mo'tea | Bubble Tea</title>
     <style>
         :root {
+            /* ОРАНЖЕВАЯ ГАММА */
             --brand-orange: #f58220; 
-            --brand-green: #3a5f4f; 
+            --brand-orange-dark: #d96b12;
             --bg: #fffaf5; 
             --text: #2d3748;
             --card: #ffffff;
         }
+        
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background-color: var(--bg);
-            background-image: radial-gradient(rgba(245, 130, 32, 0.15) 2px, transparent 2px);
+            /* Легкий паттерн из пузырьков бабл-ти */
+            background-image: radial-gradient(rgba(245, 130, 32, 0.1) 2px, transparent 2px);
             background-size: 25px 25px;
             color: var(--text);
             margin: 0;
@@ -27,6 +30,7 @@
             box-sizing: border-box;
         }
         
+        /* Кнопка возврата на главную */
         .back-btn {
             position: absolute; top: 20px; left: 20px; text-decoration: none;
             color: var(--text); font-size: 0.9rem; opacity: 0.6;
@@ -34,7 +38,8 @@
         }
         .back-btn:hover { opacity: 1; color: var(--brand-orange); }
 
-        .profile { text-align: center; margin-bottom: 25px; margin-top: 20px; }
+        /* Логотип и название */
+        .profile { text-align: center; margin-bottom: 30px; margin-top: 20px; }
         
         .logo-wrapper {
             width: 120px; height: 120px; background: var(--card); border-radius: 50%;
@@ -44,26 +49,26 @@
             overflow: hidden;
             animation: float 4s ease-in-out infinite;
         }
-        .logo-wrapper img { width: 80%; height: 80%; object-fit: contain; }
+        .logo-wrapper img { width: 85%; height: 85%; object-fit: contain; }
         
+        /* Анимация парения */
         @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-8px); }
             100% { transform: translateY(0px); }
         }
 
-        h1 { font-size: 1.9rem; margin: 0 0 5px 0; font-weight: 900; color: var(--brand-orange); letter-spacing: -0.5px; }
-        .description { font-size: 0.95rem; opacity: 0.8; margin: 0; font-weight: 500; color: var(--brand-green); }
+        h1 { font-size: 2rem; margin: 0 0 5px 0; font-weight: 900; color: var(--brand-orange); letter-spacing: -0.5px; }
+        .description { font-size: 0.95rem; opacity: 0.8; margin: 0; font-weight: 500; color: #555; }
         
-        /* --- БЛОК ОТЗЫВА (Выделенный) --- */
+        /* --- БОЛЬШАЯ КНОПКА ОТЗЫВА --- */
         .review-box {
             width: 100%;
             max-width: 400px;
             margin-bottom: 30px;
-            animation: pulse 2s infinite; /* Легкая пульсация, чтобы привлечь внимание */
+            animation: pulse 2s infinite; 
         }
         
-        /* Анимация пульсации для кнопки отзыва */
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(245, 130, 32, 0.4); }
             70% { box-shadow: 0 0 0 15px rgba(245, 130, 32, 0); }
@@ -85,33 +90,22 @@
             box-shadow: 0 10px 25px rgba(245, 130, 32, 0.4);
             transition: 0.3s;
         }
-        .btn-review-main:hover {
-            transform: translateY(-3px) scale(1.02);
-            background: #e06c14;
-        }
-        .btn-review-main img {
-            width: 35px; height: 35px;
-            background: white; border-radius: 50%; padding: 3px;
-        }
+        .btn-review-main:hover { transform: translateY(-3px) scale(1.02); background: var(--brand-orange-dark); }
+        .btn-review-main img { width: 35px; height: 35px; background: white; border-radius: 50%; padding: 3px; }
 
-        /* --- БЛОК СОЦСЕТЕЙ --- */
+        /* Заголовок над кнопками */
         .socials-title {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #a0aec0;
-            font-weight: 700;
-            margin-bottom: 15px;
-            text-align: center;
-            width: 100%;
+            font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;
+            color: #a0aec0; font-weight: 700; margin-bottom: 15px; text-align: center; width: 100%;
         }
 
+        /* --- КНОПКИ ССЫЛОК --- */
         .links-container { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 12px; }
         
         .link-btn {
-            display: flex; align-items: center; padding: 14px 20px; background: var(--card);
+            display: flex; align-items: center; padding: 16px 20px; background: var(--card);
             color: var(--text); text-decoration: none; border-radius: 16px; font-weight: 700;
-            font-size: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            font-size: 1.05rem; box-shadow: 0 4px 10px rgba(0,0,0,0.03);
             transition: all 0.3s ease; border: 2px solid transparent;
         }
         .link-btn:hover { 
@@ -120,13 +114,9 @@
             box-shadow: 0 6px 15px rgba(245, 130, 32, 0.15); 
         }
         
-        .link-btn .icon-img {
-            width: 28px; height: 28px; margin-right: 15px; object-fit: contain; border-radius: 6px;
-        }
+        .link-btn .icon-img { width: 28px; height: 28px; margin-right: 15px; object-fit: contain; border-radius: 6px; }
 
-        .green-btn { background: #eef5f2; color: var(--brand-green); border: 1px solid #d1e0da; }
-        .green-btn:hover { border-color: var(--brand-green); background: #e2eee9; }
-
+        /* Подпись QuickTap */
         .powered-by { margin-top: 50px; font-size: 0.8rem; opacity: 0.5; text-align: center; }
         .powered-by a { color: var(--brand-orange); text-decoration: none; font-weight: 900; }
     </style>
@@ -137,45 +127,44 @@
 
     <div class="profile">
         <div class="logo-wrapper">
+            <!-- ЛОГОТИП -->
             <img src="lilimotea-icon.jpg" alt="Lili Mo'tea">
         </div>
         <h1>Lili Mo'tea</h1>
         <p class="description">Свежий бабл-ти и авторские напитки</p>
     </div>
 
-    <!-- ========================================== -->
-    <!-- ОТДЕЛЬНЫЙ БЛОК ДЛЯ ОТЗЫВА (Сразу под лого) -->
-    <!-- ========================================== -->
+    <!-- БОЛЬШАЯ КНОПКА ОТЗЫВА -->
     <div class="review-box">
-        <a href="#" class="btn-review-main" target="_blank">
+        <a href="https://2gis.kg/bishkek/geo/70000001092863841/tab/reviews" class="btn-review-main" target="_blank">
+            <!-- ИКОНКА 2ГИС -->
             <img src="2gis-icon.png" alt="2ГИС"> 
             Оставить отзыв
         </a>
     </div>
 
-    <!-- Разделитель -->
-    <div class="socials-title">Наши соцсети и контакты</div>
+    <div class="socials-title">Наши контакты</div>
 
-    <!-- Блок соцсетей -->
     <div class="links-container">
         
-        <a href="#" class="link-btn" target="_blank">
+        <!-- ИНСТАГРАМ -->
+        <a href="https://instagram.com/lili_mo_tea" class="link-btn" target="_blank">
+            <!-- ИКОНКА ИНСТАГРАМ -->
             <img src="inst-icon.png" alt="Instagram" class="icon-img"> 
             Мы в Instagram
         </a>
-        
-        <a href="#" class="link-btn green-btn" target="_blank">
-            <img src="tg-icon.png" alt="Telegram" class="icon-img"> 
-            Наш Telegram-канал
-        </a>
 
-        <a href="#" class="link-btn" target="_blank">
+        <!-- 2ГИС МАРШРУТ -->
+        <a href="https://2gis.kg/bishkek/geo/70000001092863841" class="link-btn" target="_blank">
+            <!-- ИКОНКА 2ГИС -->
             <img src="2gis-icon.png" alt="2ГИС" class="icon-img"> 
             Как нас найти (2ГИС)
         </a>
 
-        <a href="tel:+" class="link-btn">
-            <img src="2gis-icon.png" alt="Phone" class="icon-img" style="filter: grayscale(1);"> 
+        <!-- ТЕЛЕФОН -->
+        <a href="tel:+996504552355" class="link-btn">
+            <!-- Иконка телефона (пока эмодзи) -->
+            <span class="icon-img" style="display:flex; justify-content:center; align-items:center; font-size: 1.5rem; background: #f0f0f0;">📞</span> 
             Позвонить нам
         </a>
         
@@ -186,4 +175,4 @@
     </div>
 
 </body>
-</html>
+    </html>
