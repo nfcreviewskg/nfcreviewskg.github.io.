@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASDEM - Оптовые поставки</title>
+    <link rel="icon" type="image/png" href="logo-quicktap.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #8568A6; 
+            --hover-color: #6A4F8B;
+            --bg-color: #F5F2F9; 
+            --text-main: #333333;
+            --text-muted: #777777;
+            --white: #ffffff;
+            --whatsapp: #25D366;
+            --2gis: #1A9E4E;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: var(--white);
+            width: 100%;
+            max-width: 420px;
+            border-radius: 24px;
+            padding: 40px 30px;
+            box-shadow: 0 10px 30px rgba(133, 104, 166, 0.15);
+            text-align: center;
+            position: relative;
+        }
+
+        /* --- ЛОГОТИП ПАРТНЁРА (ASDEM) --- */
+        .logo-container {
+            width: 130px;
+            height: 130px;
+            margin: 0 auto 20px;
+            background-color: var(--white);
+            border: 3px solid var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            padding: 10px;
+        }
+
+        .logo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .brand-name {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .tagline {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        /* --- ИНФО БЛОК (Адрес и Телефон под лого) --- */
+        .info-block {
+            margin-bottom: 25px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+        }
+
+        .info-item i {
+            color: var(--primary-color);
+            font-size: 16px;
+        }
+
+        /* --- ГЛАВНАЯ КНОПКА --- */
+        .main-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            background-color: var(--primary-color);
+            color: var(--white);
+            text-decoration: none;
+            padding: 16px 20px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(133, 104, 166, 0.3);
+        }
+
+        .main-btn:hover {
+            background-color: var(--hover-color);
+            transform: translateY(-2px);
+        }
+
+        .main-btn img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+
+        .main-btn i {
+            font-size: 20px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #A0A0A0;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        /* --- СПИСОК КОНТАКТОВ --- */
+        .contact-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .contact-btn {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 15px;
+            font-weight: 600;
+            padding: 12px 15px;
+            border-radius: 12px;
+            transition: background-color 0.3s ease;
+        }
+
+        .contact-btn:hover {
+            background-color: var(--bg-color);
+        }
+
+        .icon-box {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--white);
+            font-size: 20px;
+            overflow: hidden;
+            background-color: #EAEAEA;
+        }
+
+        .icon-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .icon-box:has(img) {
+            background-color: transparent;
+        }
+
+        .icon-2gis { background-color: var(--2gis); }
+        .icon-whatsapp { background-color: var(--whatsapp); }
+        .icon-phone { background-color: #FF9800; }
+
+        /* --- ПОДВАЛ (QuickTap) --- */
+        .footer {
+            margin-top: 40px;
+            font-size: 11px;
+            color: #B0B0B0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-logo {
+            height: 24px;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-logo:hover {
+            opacity: 1;
+        }
+
+        .footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        
+        <!-- ЛОГОТИП ПАРТНЁРА -->
+        <div class="logo-container">
+            <img src="logo-asdem.png" alt="ASDEM Logo" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'color:#8568A6; font-size:24px; font-weight:bold;\'>ASDEM</span>';">
+        </div>
+
+        <h1 class="brand-name">ASDEM</h1>
+        <p class="tagline">Пижамы, пеньюары и домашняя одежда оптом</p>
+
+        <!-- Адрес и телефон под логотипом -->
+        <div class="info-block">
+            <div class="info-item">
+                <i class="fa-solid fa-location-dot"></i>
+                <span>Дордой, Кербен, Мир белья, 9 ряд, 68к.</span>
+            </div>
+            <div class="info-item">
+                <i class="fa-solid fa-phone"></i>
+                <span>+996 772 179 559</span>
+            </div>
+        </div>
+
+        <!-- ГЛАВНАЯ КНОПКА -->
+        <a href="https://asdem-pijamy.shop/" target="_blank" class="main-btn">
+            <img src="phone-icon.png" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+            <i class="fa-solid fa-globe" style="display:none;"></i>
+            Перейти на сайт
+        </a>
+
+        <div class="section-title">Наши контакты</div>
+
+        <div class="contact-list">
+            <!-- Инстаграм -->
+            <a href="https://www.instagram.com/asdem_optom" target="_blank" class="contact-btn">
+                <div class="icon-box">
+                    <img src="inst-icon.png" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                    <i class="fa-brands fa-instagram" style="display:none; color: #E1306C;"></i>
+                </div>
+                <span>Мы в Instagram</span>
+            </a>
+
+            <!-- Ватсап -->
+            <a href="https://wa.me/996772179559" target="_blank" class="contact-btn">
+                <div class="icon-box">
+                    <img src="whatsapp-icon.png" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
+                    <i class="fa-brands fa-whatsapp" style="display:none; color: var(--whatsapp);"></i>
+                </div>
+                <span>Написать в WhatsApp</span>
+            </a>
+
+            <!-- 2ГИС -->
+            <a href="https://2gis.kg/bishkek/geo/70000001098888676" target="_blank" class="contact-btn">
+                <div class="icon-box icon-2gis">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                </div>
+                <span>Как нас найти (2ГИС)</span>
+            </a>
+
+            <!-- Позвонить нам -->
+            <a href="tel:+996772179559" class="contact-btn">
+                <div class="icon-box icon-phone">
+                    <i class="fa-solid fa-phone"></i>
+                </div>
+                <span>Позвонить нам</span>
+            </a>
+        </div>
+
+        <!-- ПОДВАЛ С ЛОГОТИПОМ QUICKTAP -->
+        <div class="footer">
+            <a href="#" target="_blank">
+                <img src="logo-quicktap.png" alt="QuickTap" class="footer-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <span style="display:none; color:var(--primary-color); font-weight:700; font-size:14px;">QuickTap</span>
+            </a>
+            <span>Работает на технологии QuickTap</span>
+        </div>
+
+    </div>
+
+</body>
+</html>
