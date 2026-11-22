@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -5,20 +6,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ASDEM | Оптовые поставки</title>
     <link rel="icon" type="image/png" href="logo-quicktap.png">
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    
+
     <style>
         :root {
-            --brand-purple: #8568A6; 
+            --brand-purple: #8568A6;
             --brand-purple-dark: #6A4F8B;
-            --bg: #F8F6FB; 
+            --bg: #F8F6FB;
             --text: #2d3748;
             --card: #ffffff;
             --whatsapp: #25D366;
             --2gis: #1A9E4E;
         }
-        
+
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background-color: var(--bg);
@@ -33,51 +34,83 @@
             padding: 40px 20px;
             box-sizing: border-box;
         }
-        
+
         /* Кнопка возврата на главную */
         .back-btn {
-            position: absolute; top: 20px; left: 20px; text-decoration: none;
-            color: var(--text); font-size: 0.9rem; opacity: 0.6;
-            display: flex; align-items: center; gap: 5px; font-weight: 600; transition: 0.3s;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            text-decoration: none;
+            color: var(--text);
+            font-size: 0.9rem;
+            opacity: 0.6;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: 600;
+            transition: 0.3s;
             z-index: 10;
         }
-        .back-btn:hover { opacity: 1; color: var(--brand-purple); transform: translateX(-3px); }
+
+        .back-btn:hover {
+            opacity: 1;
+            color: var(--brand-purple);
+            transform: translateX(-3px);
+        }
 
         /* Логотип и название */
-        .profile { text-align: center; margin-bottom: 25px; margin-top: 30px; width: 100%; max-width: 420px; }
-        
+        .profile {
+            text-align: center;
+            margin-bottom: 25px;
+            margin-top: 30px;
+            width: 100%;
+            max-width: 420px;
+        }
+
         .logo-wrapper {
-            width: 130px; 
-            height: 130px; 
-            background: var(--card); 
+            width: 130px;
+            height: 130px;
+            background: var(--card);
             border-radius: 50%;
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            box-shadow: 0 10px 30px rgba(133, 104, 166, 0.2); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(133, 104, 166, 0.2);
             margin: 0 auto 15px;
             border: 4px solid var(--brand-purple);
             overflow: hidden;
             animation: float 4s ease-in-out infinite;
         }
-        
-        .logo-wrapper img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            object-position: center; 
+
+        .logo-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
         }
-        
+
         @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-8px); }
             100% { transform: translateY(0px); }
         }
 
-        h1 { font-size: 2.2rem; margin: 0 0 5px 0; font-weight: 900; color: var(--brand-purple); letter-spacing: -0.5px; }
-        
-        .description { font-size: 0.95rem; opacity: 0.8; margin: 0 0 10px 0; font-weight: 500; color: #555; }
-        
+        h1 {
+            font-size: 2.2rem;
+            margin: 0 0 5px 0;
+            font-weight: 900;
+            color: var(--brand-purple);
+            letter-spacing: -0.5px;
+        }
+
+        .description {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            margin: 0 0 10px 0;
+            font-weight: 500;
+            color: #555;
+        }
+
         /* Адрес и телефон */
         .info-row {
             display: flex;
@@ -86,8 +119,17 @@
             align-items: center;
             margin-bottom: 25px;
         }
-        .address { font-size: 0.85rem; color: #888; font-weight: 500; display: flex; align-items: center; gap: 5px; margin: 0; }
-        
+
+        .address {
+            font-size: 0.85rem;
+            color: #888;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin: 0;
+        }
+
         .phone-text {
             display: flex;
             align-items: center;
@@ -99,17 +141,25 @@
             text-decoration: none;
             transition: 0.3s;
         }
-        .phone-text:hover { color: var(--brand-purple-dark); }
-        .phone-text img { width: 18px; height: 18px; object-fit: contain; }
 
-        /* --- БОЛЬШАЯ КНОПКА "ПЕРЕЙТИ НА САЙТ" --- */
+        .phone-text:hover {
+            color: var(--brand-purple-dark);
+        }
+
+        .phone-text img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+        }
+
+        /* Большая кнопка сайта */
         .main-action-box {
             width: 100%;
             max-width: 420px;
             margin-bottom: 30px;
-            animation: pulse 2.5s infinite; 
+            animation: pulse 2.5s infinite;
         }
-        
+
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(133, 104, 166, 0.4); }
             70% { box-shadow: 0 0 0 15px rgba(133, 104, 166, 0); }
@@ -131,41 +181,71 @@
             box-shadow: 0 10px 25px rgba(133, 104, 166, 0.3);
             transition: all 0.3s ease;
         }
-        .btn-main:hover { 
-            transform: translateY(-3px) scale(1.02); 
-            background: var(--brand-purple-dark); 
+
+        .btn-main:hover {
+            transform: translateY(-3px) scale(1.02);
+            background: var(--brand-purple-dark);
             box-shadow: 0 15px 35px rgba(133, 104, 166, 0.4);
         }
-        .btn-main img { width: 28px; height: 28px; object-fit: contain; }
+
+        .btn-main img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+        }
 
         /* Заголовок над кнопками */
         .socials-title {
-            font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px;
-            color: #a0aec0; font-weight: 700; margin-bottom: 15px; text-align: center; width: 100%;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #a0aec0;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-align: center;
+            width: 100%;
         }
 
-        /* --- СПИСОК КОНТАКТОВ --- */
-        .links-container { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 12px; }
-        
+        /* Список контактов */
+        .links-container {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
         .link-btn {
-            display: flex; align-items: center; padding: 16px 20px; background: var(--card);
-            color: var(--text); text-decoration: none; border-radius: 16px; font-weight: 700;
-            font-size: 1.05rem; box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-            transition: all 0.3s ease; border: 2px solid transparent;
-            /* Чтобы цветная полоска слева была ровной */
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            background: var(--card);
+            color: var(--text);
+            text-decoration: none;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
             position: relative;
             overflow: hidden;
         }
-        .link-btn:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08); 
-        }
-        
-        .link-btn .icon-img { width: 32px; height: 32px; margin-right: 15px; object-fit: contain; border-radius: 8px; }
 
-        /* --- ЦВЕТНЫЕ ПОЛОСКИ СЛЕВА --- */
-        
-        /* Инстаграм (градиент) */
+        .link-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+
+        .link-btn .icon-img {
+            width: 32px;
+            height: 32px;
+            margin-right: 15px;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        /* Instagram */
         .btn-instagram::before {
             content: '';
             position: absolute;
@@ -176,9 +256,12 @@
             background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
             border-radius: 16px 0 0 16px;
         }
-        .btn-instagram:hover { border-color: #dc2743; }
 
-        /* Ватсап (зеленый) */
+        .btn-instagram:hover {
+            border-color: #dc2743;
+        }
+
+        /* WhatsApp */
         .btn-wa::before {
             content: '';
             position: absolute;
@@ -189,9 +272,28 @@
             background: var(--whatsapp);
             border-radius: 16px 0 0 16px;
         }
-        .btn-wa:hover { border-color: var(--whatsapp); }
 
-        /* 2ГИС (зеленый) */
+        .btn-wa:hover {
+            border-color: var(--whatsapp);
+        }
+
+        /* Telegram */
+        .btn-tg::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+            background: #229ED9;
+            border-radius: 16px 0 0 16px;
+        }
+
+        .btn-tg:hover {
+            border-color: #229ED9;
+        }
+
+        /* 2ГИС */
         .btn-2gis::before {
             content: '';
             position: absolute;
@@ -202,9 +304,12 @@
             background: var(--2gis);
             border-radius: 16px 0 0 16px;
         }
-        .btn-2gis:hover { border-color: var(--2gis); }
 
-        /* Позвонить (фиолетовый) */
+        .btn-2gis:hover {
+            border-color: var(--2gis);
+        }
+
+        /* Позвонить */
         .btn-call::before {
             content: '';
             position: absolute;
@@ -215,13 +320,39 @@
             background: var(--brand-purple);
             border-radius: 16px 0 0 16px;
         }
-        .btn-call:hover { border-color: var(--brand-purple); }
 
-        /* Подпись QuickTap */
-        .powered-by { margin-top: 50px; font-size: 0.8rem; opacity: 0.6; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px;}
-        .powered-by img { height: 20px; opacity: 0.8; transition: 0.3s; }
-        .powered-by a:hover img { opacity: 1; }
-        .powered-by a { color: var(--brand-purple); text-decoration: none; font-weight: 900; font-size: 0.9rem; }
+        .btn-call:hover {
+            border-color: var(--brand-purple);
+        }
+
+        /* QuickTap */
+        .powered-by {
+            margin-top: 50px;
+            font-size: 0.8rem;
+            opacity: 0.6;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .powered-by img {
+            height: 20px;
+            opacity: 0.8;
+            transition: 0.3s;
+        }
+
+        .powered-by a:hover img {
+            opacity: 1;
+        }
+
+        .powered-by a {
+            color: var(--brand-purple);
+            text-decoration: none;
+            font-weight: 900;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -234,11 +365,11 @@
         </div>
         <h1>ASDEM</h1>
         <p class="description">Пижамы, пеньюары и одежда оптом</p>
-        
+
         <div class="info-row">
             <p class="address">📍 Дордой, Кербен, Мир белья, 9 ряд, 68к.</p>
             <a href="tel:+996772179559" class="phone-text">
-                <img src="phone-icon.png" alt="Phone" onerror="this.style.display='none';"> 
+                <img src="phone-icon.png" alt="Phone" onerror="this.style.display='none';">
                 +996 772 179 559
             </a>
         </div>
@@ -246,7 +377,7 @@
 
     <div class="main-action-box">
         <a href="https://asdem-pijamy.shop/" class="btn-main" target="_blank">
-            <img src="web-icon.png" alt="Сайт" onerror="this.style.display='none';"> 
+            <img src="web-icon.png" alt="Сайт" onerror="this.style.display='none';">
             Перейти на сайт
         </a>
     </div>
@@ -254,31 +385,37 @@
     <div class="socials-title">Наши контакты</div>
 
     <div class="links-container">
-        
-        <!-- ИНСТАГРАМ (с градиентом) -->
+
+        <!-- Instagram -->
         <a href="https://www.instagram.com/asdem_optom" class="link-btn btn-instagram" target="_blank">
-            <img src="inst-icon.png" alt="Instagram" class="icon-img" onerror="this.style.display='none';"> 
+            <img src="inst-icon.png" alt="Instagram" class="icon-img" onerror="this.style.display='none';">
             Мы в Instagram
         </a>
 
-        <!-- ВАТСАП (зеленый) -->
+        <!-- WhatsApp -->
         <a href="https://wa.me/996772179559" class="link-btn btn-wa" target="_blank">
-            <img src="whatsapp-icon.png" alt="WhatsApp" class="icon-img" onerror="this.style.display='none';"> 
+            <img src="whatsapp-icon.png" alt="WhatsApp" class="icon-img" onerror="this.style.display='none';">
             Написать в WhatsApp
         </a>
 
-        <!-- ПОЗВОНИТЬ (фиолетовый, теперь выше 2ГИС) -->
+        <!-- Telegram -->
+        <a href="https://t.me/asdem_optom" class="link-btn btn-tg" target="_blank" rel="noopener noreferrer">
+            <img src="tg-icon.png" alt="Telegram" class="icon-img" onerror="this.style.display='none';">
+            Перейти в Telegram
+        </a>
+
+        <!-- Позвонить -->
         <a href="tel:+996772179559" class="link-btn btn-call">
-            <img src="phone-icon.png" alt="Phone" class="icon-img" onerror="this.style.display='none';"> 
+            <img src="phone-icon.png" alt="Phone" class="icon-img" onerror="this.style.display='none';">
             Позвонить нам
         </a>
 
-        <!-- 2ГИС (зеленый, теперь внизу) -->
+        <!-- 2ГИС -->
         <a href="https://2gis.kg/bishkek/geo/70000001098888676" class="link-btn btn-2gis" target="_blank">
-            <img src="2gis-icon.png" alt="2ГИС" class="icon-img" onerror="this.style.display='none';"> 
+            <img src="2gis-icon.png" alt="2ГИС" class="icon-img" onerror="this.style.display='none';">
             Как нас найти (2ГИС)
         </a>
-        
+
     </div>
 
     <div class="powered-by">
