@@ -1,787 +1,251 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>XAU/USD — Gold Chart</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XAU/USD — Trading Terminal</title>
 <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
-
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;background:#131722;color:#d1d4dc;font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:13px}
-#app{display:flex;flex-direction:column;height:100vh;height:100dvh}
-
-#topbar{display:flex;align-items:center;gap:8px;padding:0 10px;height:48px;background:#1e222d;border-bottom:1px solid #2a2e39;z-index:100;flex-shrink:0}
-.logo{font-weight:700;color:#ffb800;font-size:14px;white-space:nowrap}
-#symbol{color:#ffb800;font-weight:600;font-size:14px;white-space:nowrap}
-#status{font-size:11px;color:#787b86;margin-left:auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#tfToggle{display:none;background:#2a2e39;color:#d1d4dc;border:1px solid #363a45;border-radius:4px;padding:6px 10px;font-size:12px;font-weight:600}
-#tfRow{display:flex;gap:1px;background:#2a2e39;border-radius:4px;padding:2px;margin-left:8px}
-#tfRow button{background:transparent;color:#787b86;border:0;padding:5px 10px;border-radius:3px;font-size:12px;cursor:pointer}
-#tfRow button.active{background:#ffb800;color:#131722}
-
-#main{display:flex;flex:1;overflow:hidden;position:relative;min-height:0}
-#leftbar{width:44px;background:#1e222d;border-right:1px solid #2a2e39;display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:3px;z-index:15;flex-shrink:0}
-#leftbar button{width:32px;height:32px;background:transparent;color:#787b86;border:0;border-radius:4px;font-size:15px;cursor:pointer}
-#leftbar button.active{background:#ffb800;color:#131722}
-.sep{width:20px;height:1px;background:#363a45;margin:4px 0}
-
-#charts{flex:1;position:relative;background:#131722;min-width:0;min-height:0;overflow:hidden}
-#mainChart{position:absolute;inset:0}
-#overlay{position:absolute;inset:0;width:100%;height:100%;z-index:10;pointer-events:none;touch-action:none}
-#overlay.draw{pointer-events:auto;cursor:crosshair}
-
-#bottomBar{display:none;height:58px;background:#1e222d;border-top:1px solid #2a2e39;flex-shrink:0;z-index:100;justify-content:space-around;align-items:center;padding:0 3px;padding-bottom:env(safe-area-inset-bottom)}
-#bottomBar button{flex:1;height:100%;background:transparent;color:#787b86;border:0;font-size:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;max-width:72px}
-#bottomBar button span:last-child{font-size:9px}
-#bottomBar button.active{color:#ffb800}
-
-#tfSheet{position:fixed;left:0;right:0;bottom:0;background:#1e222d;border-radius:12px 12px 0 0;padding:16px 12px calc(16px + env(safe-area-inset-bottom));transform:translateY(110%);transition:transform .25s;z-index:1000;pointer-events:none}
-#tfSheet.open{transform:translateY(0);pointer-events:auto}
-.grab{width:36px;height:4px;background:#363a45;border-radius:2px;margin:0 auto 15px}
-.tfGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.tfGrid button{background:#2a2e39;color:#d1d4dc;border:1px solid #363a45;border-radius:6px;padding:14px 0;font-size:14px;font-weight:600}
-.tfGrid button.active{background:#ffb800;color:#131722}
-.close{position:absolute;right:14px;top:10px;background:none;border:0;color:#aaa;font-size:20px;padding:8px}
-#backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:none}
-#backdrop.show{display:block}
-
-@media(max-width:768px){
- #topbar{height:52px;padding:0 8px;gap:6px}
- .logo,#symbol{font-size:13px}
- #status{display:none}
- #tfRow,#leftbar{display:none}
- #tfToggle{display:block}
- #bottomBar{display:flex}
-}
-@media(min-width:769px){
- #tfSheet,#backdrop{display:none!important}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0b0e11;color:#e5e7eb;font-family:Arial,sans-serif;overflow:hidden}
+.topbar{height:65px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid #242a32}
+.logo{font-size:19px;font-weight:bold}
+.instrument{font-size:13px;color:#8b949e;margin-top:4px}
+.price-box{text-align:right}
+.price{font-size:20px;font-weight:bold}
+.change{font-size:12px;margin-top:4px;color:#26a69a}
+.toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:7px;padding:12px 16px;border-bottom:1px solid #242a32}
+button{background:#171c23;color:#aeb6c2;border:1px solid #303844;border-radius:5px;padding:8px 13px;cursor:pointer;font-size:13px}
+button:hover{background:#252d38;color:white}
+button.active{background:#2962ff;color:white;border-color:#2962ff}
+.separator{width:1px;height:25px;background:#303844;margin:0 5px}
+.statusbar{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;font-size:11px;color:#788492}
+.status-left{display:flex;align-items:center;gap:7px}
+.dot{width:7px;height:7px;border-radius:50%;background:#e0a43b}
+.dot.connected{background:#26a69a}
+.dot.error{background:#ef5350}
+#chart{width:100%;height:calc(100vh - 150px);min-height:300px}
+@media(max-width:600px){
+.topbar{height:58px;padding:0 12px}
+.logo{font-size:16px}
+.price{font-size:17px}
+.toolbar{padding:9px;gap:5px}
+button{padding:8px 10px;font-size:12px}
+#chart{height:calc(100vh - 155px)}
+.statusbar{padding:7px 10px}
 }
 </style>
 </head>
-
 <body>
-<div id="app">
 
- <div id="topbar">
-  <span class="logo">◈ Gold</span>
-  <span id="symbol">XAU/USD</span>
-
-  <div id="tfRow">
-   <button data-tf="1m">1m</button>
-   <button data-tf="5m">5m</button>
-   <button data-tf="15m">15m</button>
-   <button data-tf="30m">30m</button>
-   <button data-tf="1h" class="active">1H</button>
-   <button data-tf="4h">4H</button>
-   <button data-tf="1d">1D</button>
-  </div>
-
-  <button id="tfToggle">1H ▾</button>
-  <span id="status">Подключение...</span>
+<header class="topbar">
+ <div>
+  <div class="logo">XAU/USD</div>
+  <div class="instrument">Gold / US Dollar</div>
  </div>
-
- <div id="main">
-
-  <div id="leftbar">
-   <button data-tool="cursor" class="active">✥</button>
-   <div class="sep"></div>
-   <button data-tool="trend">╱</button>
-   <button data-tool="horiz">─</button>
-   <button data-tool="rect">▭</button>
-   <button data-tool="fib">F</button>
-   <div class="sep"></div>
-   <button data-tool="clear">🗑</button>
-  </div>
-
-  <div id="charts">
-   <div id="mainChart"></div>
-   <canvas id="overlay"></canvas>
-  </div>
-
+ <div class="price-box">
+  <div class="price" id="price">---</div>
+  <div class="change" id="change">Ожидание данных</div>
  </div>
+</header>
 
- <div id="bottomBar">
-  <button data-tool="cursor" class="active">✥<span>Курсор</span></button>
-  <button data-tool="trend">╱<span>Тренд</span></button>
-  <button data-tool="horiz">─<span>Гориз.</span></button>
-  <button data-tool="rect">▭<span>Прямоуг.</span></button>
-  <button data-tool="fib">F<span>Фибо</span></button>
-  <button data-tool="clear">🗑<span>Очист.</span></button>
- </div>
-
+<div class="toolbar" id="timeframes">
+ <button data-tf="1min" class="active">1m</button>
+ <button data-tf="5min">5m</button>
+ <button data-tf="15min">15m</button>
+ <button data-tf="30min">30m</button>
+ <button data-tf="1h">1H</button>
+ <button data-tf="4h">4H</button>
+ <button data-tf="1day">1D</button>
+ <div class="separator"></div>
+ <button id="fitButton">Весь график</button>
 </div>
 
-<div id="backdrop"></div>
-
-<div id="tfSheet">
- <button class="close" id="tfClose">✕</button>
- <div class="grab"></div>
-
- <div class="tfGrid">
-  <button data-tf="1m">1m</button>
-  <button data-tf="5m">5m</button>
-  <button data-tf="15m">15m</button>
-  <button data-tf="30m">30m</button>
-  <button data-tf="1h" class="active">1H</button>
-  <button data-tf="4h">4H</button>
-  <button data-tf="1d">1D</button>
+<div class="statusbar">
+ <div class="status-left">
+  <span class="dot" id="statusDot"></span>
+  <span id="status">Подключение к Twelve Data...</span>
  </div>
+ <span id="lastUpdate">--:--:--</span>
 </div>
+
+<div id="chart"></div>
 
 <script>
-(function(){
-'use strict';
+const API_KEY = "0ec885e9044e459d92e9b6cb646eb3c7";
+const API_URL = "https://api.twelvedata.com/time_series";
+const SYMBOL = "XAU/USD";
+const UPDATE_INTERVAL = 15000;
 
-const $ = id => document.getElementById(id);
+const chartElement = document.getElementById("chart");
 
-let tf='1h';
-let tool='cursor';
-let drawings=[];
-let current=null;
+const chart = LightweightCharts.createChart(chartElement,{
+ width:chartElement.clientWidth,
+ height:chartElement.clientHeight,
+ layout:{
+  background:{color:"#0b0e11"},
+  textColor:"#d1d4dc",
+  fontSize:12
+ },
+ grid:{
+  vertLines:{color:"#171c23"},
+  horzLines:{color:"#171c23"}
+ },
+ crosshair:{mode:LightweightCharts.CrosshairMode.Normal},
+ rightPriceScale:{
+  borderColor:"#303844",
+  scaleMargins:{top:0.1,bottom:0.1}
+ },
+ timeScale:{
+  borderColor:"#303844",
+  timeVisible:true,
+  secondsVisible:false,
+  rightOffset:8,
+  barSpacing:8
+ },
+ handleScroll:true,
+ handleScale:true
+});
 
-let chart,candles,overlay,ctx;
-let lastBars=[];
+const candleSeries = chart.addCandlestickSeries({
+ upColor:"#26a69a",
+ downColor:"#ef5350",
+ borderUpColor:"#26a69a",
+ borderDownColor:"#ef5350",
+ wickUpColor:"#26a69a",
+ wickDownColor:"#ef5350",
+ priceLineVisible:true,
+ lastValueVisible:true
+});
 
-let requestController=null;
-let requestId=0;
-let pollTimer=null;
-let isLoading=false;
-let firstLoad=true;
+let currentTimeframe = "1min";
+let updateTimer = null;
+let isLoading = false;
 
-const API='https://biquote.io/api/XAUUSD/ohlc';
+const priceElement = document.getElementById("price");
+const changeElement = document.getElementById("change");
+const statusElement = document.getElementById("status");
+const statusDot = document.getElementById("statusDot");
+const lastUpdateElement = document.getElementById("lastUpdate");
 
-const labels={
- '1m':'1m',
- '5m':'5m',
- '15m':'15m',
- '30m':'30m',
- '1h':'1H',
- '4h':'4H',
- '1d':'1D'
-};
-
-/* CHART */
-
-function initChart(){
-
- if(!window.LightweightCharts){
-  $('status').textContent='Ошибка библиотеки графика';
-  return false;
- }
-
- chart=LightweightCharts.createChart($('mainChart'),{
-
-  layout:{
-   background:{color:'#131722'},
-   textColor:'#d1d4dc',
-   fontSize:11
-  },
-
-  grid:{
-   vertLines:{color:'#1e222d'},
-   horzLines:{color:'#1e222d'}
-  },
-
-  crosshair:{
-   mode:LightweightCharts.CrosshairMode.Normal,
-   vertLine:{
-    color:'#758696',
-    width:1,
-    style:2,
-    labelBackgroundColor:'#363a45'
-   },
-   horzLine:{
-    color:'#758696',
-    width:1,
-    style:2,
-    labelBackgroundColor:'#363a45'
-   }
-  },
-
-  rightPriceScale:{
-   borderColor:'#363a45',
-   scaleMargins:{top:0.05,bottom:0.05}
-  },
-
-  timeScale:{
-   borderColor:'#363a45',
-   timeVisible:true,
-   secondsVisible:false,
-   rightOffset:6,
-   barSpacing:8
-  },
-
-  handleScroll:{
-   mouseWheel:true,
-   pressedMouseMove:true,
-   horzTouchDrag:true,
-   vertTouchDrag:true
-  },
-
-  handleScale:{
-   mouseWheel:true,
-   pinch:true,
-   axisPressedMouseMove:true
-  }
-
- });
-
- candles=chart.addCandlestickSeries({
-
-  upColor:'#26a69a',
-  downColor:'#ef5350',
-  borderUpColor:'#26a69a',
-  borderDownColor:'#ef5350',
-  wickUpColor:'#26a69a',
-  wickDownColor:'#ef5350'
-
- });
-
- overlay=$('overlay');
- ctx=overlay.getContext('2d');
-
- chart.timeScale().subscribeVisibleLogicalRangeChange(redraw);
-
- return true;
+function setStatus(message,type){
+ statusElement.textContent=message;
+ statusDot.className="dot";
+ if(type==="connected") statusDot.classList.add("connected");
+ if(type==="error") statusDot.classList.add("error");
 }
 
-/* DATA PARSING */
-
-function parseTime(k){
-
- const raw=k.openTime??k.time??k.t;
-
- if(typeof raw==='string'){
-  const parsed=Date.parse(raw);
-
-  if(!Number.isNaN(parsed)){
-   return Math.floor(parsed/1000);
-  }
- }
-
- const n=Number(raw);
-
- if(!Number.isFinite(n))return null;
-
- return Math.floor(n>1e12?n/1000:n);
+function parseApiDate(value){
+ const normalized=value.includes("T")?value:value.replace(" ","T");
+ const timestamp=Date.parse(normalized);
+ return Number.isFinite(timestamp)?Math.floor(timestamp/1000):NaN;
 }
 
-function normalizeBars(data){
+function updatePrice(last,first){
+ priceElement.textContent=last.close.toFixed(2);
+ priceElement.style.color=last.close>=last.open?"#26a69a":"#ef5350";
 
- let source=[];
-
- if(Array.isArray(data)){
-  source=data;
- }else if(Array.isArray(data.bars)){
-  source=data.bars;
- }else if(Array.isArray(data.data)){
-  source=data.data;
- }else{
-  throw new Error(data.message||data.error||'Нет массива свечей');
+ if(first && first.open!==0){
+  const percent=((last.close-first.open)/first.open)*100;
+  changeElement.textContent=(percent>=0?"+":"")+percent.toFixed(2)+"%";
+  changeElement.style.color=percent>=0?"#26a69a":"#ef5350";
  }
-
- const result=source.map(k=>{
-
-  const time=parseTime(k);
-
-  const open=Number(k.open??k.o);
-  const high=Number(k.high??k.h);
-  const low=Number(k.low??k.l);
-  const close=Number(k.close??k.c);
-
-  if(
-   time===null||
-   ![open,high,low,close].every(Number.isFinite)||
-   open<=0||high<=0||low<=0||close<=0||
-   high<low||
-   high<Math.max(open,close)||
-   low>Math.min(open,close)
-  )return null;
-
-  return {time,open,high,low,close};
-
- }).filter(Boolean);
-
- result.sort((a,b)=>a.time-b.time);
-
- const unique=new Map();
-
- result.forEach(bar=>unique.set(bar.time,bar));
-
- return Array.from(unique.values());
 }
 
-/* FETCH WITH 10 SECOND TIMEOUT */
-
-async function fetchBars(){
-
+async function loadCandles(){
  if(isLoading)return;
-
  isLoading=true;
 
- const myId=++requestId;
-
- const controller=new AbortController();
- requestController=controller;
-
- const timeout=setTimeout(()=>{
-  controller.abort();
- },10000);
-
- $('status').textContent='Загрузка XAU/USD...';
-
  try{
+  setStatus("Загрузка котировок...","loading");
 
-  const url=`${API}?interval=${encodeURIComponent(tf)}&limit=500`;
-
-  const response=await fetch(url,{
-   method:'GET',
-   signal:controller.signal,
-   cache:'no-store'
+  const params=new URLSearchParams({
+   symbol:SYMBOL,
+   interval:currentTimeframe,
+   outputsize:"500",
+   order:"asc",
+   apikey:API_KEY
   });
 
-  if(!response.ok){
-   throw new Error('HTTP '+response.status);
-  }
+  const response=await fetch(API_URL+"?"+params.toString());
+  if(!response.ok)throw new Error("HTTP ошибка: "+response.status);
 
   const data=await response.json();
 
-  if(myId!==requestId)return;
-
-  const bars=normalizeBars(data);
-
-  if(!bars.length){
-   throw new Error('Нет данных свечей');
+  if(data.status==="error" || data.code){
+   throw new Error(data.message||"Ошибка Twelve Data");
   }
 
-  lastBars=bars;
-
-  candles.setData(bars);
-
-  if(firstLoad){
-   chart.timeScale().fitContent();
-   firstLoad=false;
+  if(!data.values || !Array.isArray(data.values)){
+   throw new Error("API не вернул данные свечей");
   }
 
-  const last=bars[bars.length-1];
+  const candles=data.values.map(item=>({
+   time:parseApiDate(item.datetime),
+   open:Number(item.open),
+   high:Number(item.high),
+   low:Number(item.low),
+   close:Number(item.close)
+  })).filter(item=>
+   Number.isFinite(item.time)&&
+   Number.isFinite(item.open)&&
+   Number.isFinite(item.high)&&
+   Number.isFinite(item.low)&&
+   Number.isFinite(item.close)
+  ).sort((a,b)=>a.time-b.time);
 
-  $('status').textContent=
-   `● XAU/USD · ${last.close.toFixed(2)} · ${bars.length} баров`;
+  if(!candles.length)throw new Error("Нет корректных свечей");
 
-  $('status').style.color='#26a69a';
+  candleSeries.setData(candles);
 
-  redraw();
+  const last=candles[candles.length-1];
+  const first=candles[0];
+
+  updatePrice(last,first);
+  lastUpdateElement.textContent=new Date().toLocaleTimeString();
+
+  setStatus("Подключено • "+candles.length+" свечей","connected");
 
  }catch(error){
-
-  if(myId!==requestId)return;
-
-  $('status').textContent=
-   error.name==='AbortError'
-   ?'Тайм-аут: сервер не ответил за 10 секунд'
-   :'Ошибка: '+error.message;
-
-  $('status').style.color='#ef5350';
-
-  console.error('XAU/USD:',error);
-
+  console.error("XAU/USD API:",error);
+  setStatus(error.message,"error");
  }finally{
-
-  clearTimeout(timeout);
-
-  if(myId===requestId){
-   isLoading=false;
-  }
-
+  isLoading=false;
  }
-
 }
 
-/* TIMEFRAMES */
+function selectTimeframe(timeframe){
+ currentTimeframe=timeframe;
 
-function selectTf(value){
-
- if(!labels[value]||value===tf)return;
-
- tf=value;
- firstLoad=true;
-
- document.querySelectorAll('[data-tf]').forEach(b=>{
-  b.classList.toggle('active',b.dataset.tf===tf);
+ document.querySelectorAll("#timeframes button[data-tf]").forEach(button=>{
+  button.classList.toggle("active",button.dataset.tf===timeframe);
  });
 
- $('tfToggle').textContent=labels[tf]+' ▾';
-
- if(requestController){
-  requestController.abort();
- }
-
- isLoading=false;
-
- fetchBars();
- resetPoll();
-
+ clearInterval(updateTimer);
+ candleSeries.setData([]);
+ loadCandles();
+ updateTimer=setInterval(loadCandles,UPDATE_INTERVAL);
 }
 
-/* AUTO UPDATE */
-
-function resetPoll(){
-
- if(pollTimer)clearInterval(pollTimer);
-
- pollTimer=setInterval(()=>{
-  if(!isLoading)fetchBars();
- },15000);
-
-}
-
-/* DRAWING */
-
-function redraw(){
-
- if(!ctx||!chart)return;
-
- const w=overlay.width/(devicePixelRatio||1);
- const h=overlay.height/(devicePixelRatio||1);
-
- ctx.clearRect(0,0,w,h);
-
- drawings.forEach(d=>drawShape(d,false));
-
- if(current)drawShape(current,true);
-
-}
-
-function drawShape(d,preview){
-
- const color=preview?
- 'rgba(255,184,0,0.9)':'#ffb800';
-
- ctx.strokeStyle=color;
- ctx.fillStyle=color;
- ctx.lineWidth=1.5;
- ctx.font='11px sans-serif';
-
- const ts=chart.timeScale();
- const w=overlay.width/(devicePixelRatio||1);
-
- if(d.type==='horiz'){
-
-  const y=candles.priceToCoordinate(d.p1.price);
-
-  if(y==null)return;
-
-  ctx.beginPath();
-  ctx.moveTo(0,y);
-  ctx.lineTo(w,y);
-  ctx.stroke();
-
-  const label=d.p1.price.toFixed(2);
-
-  ctx.fillStyle='#ffb800';
-  ctx.fillRect(2,y-15,ctx.measureText(label).width+9,14);
-
-  ctx.fillStyle='#131722';
-  ctx.fillText(label,6,y-5);
-
-  return;
- }
-
- const x1=ts.timeToCoordinate(d.p1.time);
- const y1=candles.priceToCoordinate(d.p1.price);
- const x2=ts.timeToCoordinate(d.p2.time);
- const y2=candles.priceToCoordinate(d.p2.price);
-
- if([x1,y1,x2,y2].some(v=>v==null))return;
-
- if(d.type==='trend'){
-
-  ctx.beginPath();
-  ctx.moveTo(x1,y1);
-  ctx.lineTo(x2,y2);
-  ctx.stroke();
-
- }
-
- if(d.type==='rect'){
-
-  const left=Math.min(x1,x2);
-  const top=Math.min(y1,y2);
-  const width=Math.abs(x2-x1);
-  const height=Math.abs(y2-y1);
-
-  ctx.fillStyle='rgba(255,184,0,0.10)';
-  ctx.fillRect(left,top,width,height);
-
-  ctx.strokeStyle=color;
-  ctx.strokeRect(left,top,width,height);
-
- }
-
- if(d.type==='fib'){
-
-  const left=Math.min(x1,x2);
-  const right=Math.max(x1,x2);
-
-  const levels=[0,0.236,0.382,0.5,0.618,0.786,1];
-
-  levels.forEach(level=>{
-
-   const price=d.p1.price+(d.p2.price-d.p1.price)*level;
-
-   const y=candles.priceToCoordinate(price);
-
-   if(y==null)return;
-
-   ctx.strokeStyle=
-    level===0||level===1?
-    color:'rgba(255,184,0,0.6)';
-
-   ctx.beginPath();
-   ctx.moveTo(left,y);
-   ctx.lineTo(right,y);
-   ctx.stroke();
-
-   ctx.fillStyle='#ffb800';
-
-   ctx.fillText(
-    `${(level*100).toFixed(1)}% ${price.toFixed(2)}`,
-    left+4,
-    y-4
-   );
-
-  });
-
-  ctx.setLineDash([3,3]);
-
-  ctx.beginPath();
-  ctx.moveTo(x1,y1);
-  ctx.lineTo(x2,y2);
-  ctx.stroke();
-
-  ctx.setLineDash([]);
-
- }
-
-}
-
-/* POINTER */
-
-function getPoint(e){
-
- const r=overlay.getBoundingClientRect();
-
- const x=e.clientX-r.left;
- const y=e.clientY-r.top;
-
- const time=chart.timeScale().coordinateToTime(x);
- const price=candles.coordinateToPrice(y);
-
- if(time===null||time===undefined||price===null||price===undefined){
-  return null;
- }
-
- return {time,price};
-
-}
-
-function startDraw(e){
-
- if(tool==='cursor')return;
-
- if(e.pointerType==='mouse'&&e.button!==0)return;
-
- const p=getPoint(e);
-
- if(!p)return;
-
- e.preventDefault();
-
- try{
-  overlay.setPointerCapture(e.pointerId);
- }catch(err){}
-
- if(tool==='horiz'){
-
-  drawings.push({type:'horiz',p1:p});
-  redraw();
-  return;
-
- }
-
- current={
-  type:tool,
-  p1:p,
-  p2:p
- };
-
- redraw();
-
-}
-
-function moveDraw(e){
-
- if(!current)return;
-
- e.preventDefault();
-
- const p=getPoint(e);
-
- if(p){
-  current.p2=p;
-  redraw();
- }
-
-}
-
-function endDraw(e){
-
- if(!current)return;
-
- const p=getPoint(e);
-
- if(p)current.p2=p;
-
- drawings.push(current);
- current=null;
-
- redraw();
-
-}
-
-overlay.addEventListener('pointerdown',startDraw);
-overlay.addEventListener('pointermove',moveDraw);
-overlay.addEventListener('pointerup',endDraw);
-overlay.addEventListener('pointercancel',endDraw);
-
-/* TOOL SELECT */
-
-function selectTool(t){
-
- tool=t;
-
- document.querySelectorAll('[data-tool]').forEach(b=>{
-  b.classList.toggle('active',b.dataset.tool===t);
- });
-
- overlay.classList.toggle('draw',t!=='cursor');
-
-}
-
-document.querySelectorAll('[data-tool]').forEach(b=>{
-
- b.addEventListener('click',()=>{
-
-  const t=b.dataset.tool;
-
-  if(t==='clear'){
-   drawings=[];
-   current=null;
-   redraw();
-   return;
-  }
-
-  selectTool(t);
-
- });
-
+document.querySelectorAll("#timeframes button[data-tf]").forEach(button=>{
+ button.addEventListener("click",()=>selectTimeframe(button.dataset.tf));
 });
 
-/* MOBILE TIMEFRAME MENU */
-
-function openSheet(){
-
- $('tfSheet').classList.add('open');
- $('backdrop').classList.add('show');
-
-}
-
-function closeSheet(){
-
- $('tfSheet').classList.remove('open');
- $('backdrop').classList.remove('show');
-
-}
-
-$('tfToggle').addEventListener('click',openSheet);
-$('backdrop').addEventListener('click',closeSheet);
-$('tfClose').addEventListener('click',closeSheet);
-
-document.querySelectorAll('#tfSheet [data-tf]').forEach(b=>{
-
- b.addEventListener('click',()=>{
-
-  selectTf(b.dataset.tf);
-  closeSheet();
-
- });
-
+document.getElementById("fitButton").addEventListener("click",()=>{
+ chart.timeScale().fitContent();
 });
 
-/* DESKTOP TIMEFRAME MENU */
-
-document.querySelectorAll('#tfRow [data-tf]').forEach(b=>{
-
- b.addEventListener('click',()=>{
-  selectTf(b.dataset.tf);
+const resizeObserver=new ResizeObserver(()=>{
+ chart.applyOptions({
+  width:chartElement.clientWidth,
+  height:chartElement.clientHeight
  });
-
 });
 
-/* RESIZE */
+resizeObserver.observe(chartElement);
 
-function resize(){
-
- if(!chart)return;
-
- const el=$('mainChart');
-
- const w=el.clientWidth;
- const h=el.clientHeight;
-
- if(w<=0||h<=0)return;
-
- chart.resize(w,h);
-
- const dpr=window.devicePixelRatio||1;
-
- overlay.width=Math.round(w*dpr);
- overlay.height=Math.round(h*dpr);
-
- overlay.style.width=w+'px';
- overlay.style.height=h+'px';
-
- ctx.setTransform(dpr,0,0,dpr,0,0);
-
- redraw();
-
-}
-
-const resizeObserver=new ResizeObserver(resize);
-
-resizeObserver.observe($('charts'));
-
-window.addEventListener('resize',resize);
-
-/* BOOT */
-
-function boot(){
-
- if(!initChart())return;
-
- resize();
-
- fetchBars();
-
- resetPoll();
-
-}
-
-requestAnimationFrame(boot);
-
-})();
+selectTimeframe("1min");
 </script>
 </body>
 </html>
