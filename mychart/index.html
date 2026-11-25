@@ -1,251 +1,261 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>XAU/USD — Trading Terminal</title>
+<title>XAU/USD Pro Terminal</title>
 <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#0b0e11;color:#e5e7eb;font-family:Arial,sans-serif;overflow:hidden}
-.topbar{height:65px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid #242a32}
-.logo{font-size:19px;font-weight:bold}
-.instrument{font-size:13px;color:#8b949e;margin-top:4px}
-.price-box{text-align:right}
-.price{font-size:20px;font-weight:bold}
-.change{font-size:12px;margin-top:4px;color:#26a69a}
-.toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:7px;padding:12px 16px;border-bottom:1px solid #242a32}
-button{background:#171c23;color:#aeb6c2;border:1px solid #303844;border-radius:5px;padding:8px 13px;cursor:pointer;font-size:13px}
-button:hover{background:#252d38;color:white}
-button.active{background:#2962ff;color:white;border-color:#2962ff}
-.separator{width:1px;height:25px;background:#303844;margin:0 5px}
-.statusbar{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;font-size:11px;color:#788492}
-.status-left{display:flex;align-items:center;gap:7px}
-.dot{width:7px;height:7px;border-radius:50%;background:#e0a43b}
-.dot.connected{background:#26a69a}
-.dot.error{background:#ef5350}
-#chart{width:100%;height:calc(100vh - 150px);min-height:300px}
-@media(max-width:600px){
-.topbar{height:58px;padding:0 12px}
-.logo{font-size:16px}
-.price{font-size:17px}
-.toolbar{padding:9px;gap:5px}
-button{padding:8px 10px;font-size:12px}
-#chart{height:calc(100vh - 155px)}
-.statusbar{padding:7px 10px}
-}
+:root{--bg:#0b0e11;--panel:#11161d;--line:#252d38;--muted:#8b98a8;--text:#e6edf3;--blue:#2962ff;--green:#26a69a;--red:#ef5350}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:13px Arial,sans-serif}
+button,input{font:inherit}button{background:#1a2029;color:#c5ced8;border:1px solid #303a47;border-radius:5px;padding:8px 10px;cursor:pointer}
+button:hover{background:#273140}button.active{background:var(--blue);border-color:var(--blue);color:white}
+header{height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--line);background:#0d1117}
+.brand{font-size:18px;font-weight:700}.sub{color:var(--muted);font-size:11px;margin-top:4px}
+.quote{text-align:right}.quote strong{font-size:21px}.quote small{display:block;color:var(--muted);margin-top:3px}
+.app{display:grid;grid-template-columns:minmax(0,1fr) 300px;min-height:calc(100vh - 62px)}
+.main{min-width:0;border-right:1px solid var(--line)}
+.toolbar{display:flex;flex-wrap:wrap;gap:6px;padding:10px;border-bottom:1px solid var(--line);background:#0e1319}
+.group-label{color:var(--muted);font-size:10px;align-self:center;margin:0 3px}
+#chartWrap{height:calc(100vh - 190px);min-height:390px;position:relative}
+#chart{width:100%;height:100%}
+#drawLayer{position:absolute;inset:0;width:100%;height:100%;pointer-events:auto;touch-action:none;z-index:5}
+.status{display:flex;justify-content:space-between;gap:10px;padding:8px 12px;color:var(--muted);font-size:11px;border-top:1px solid var(--line)}
+.sidebar{background:var(--panel);padding:12px;overflow:auto}
+.card{border:1px solid var(--line);background:#0d1218;border-radius:8px;padding:12px;margin-bottom:10px}
+.card h3{font-size:13px;margin:0 0 10px}
+.muted{color:var(--muted)}.big{font-size:24px;font-weight:700}
+.biasbar{height:9px;background:#303844;border-radius:8px;overflow:hidden;display:flex;margin:10px 0}
+#longBar{background:var(--green);width:50%}#shortBar{background:var(--red);width:50%}
+.biasrow{display:flex;justify-content:space-between;font-weight:700}
+.metric{display:flex;justify-content:space-between;margin:8px 0;color:#c6d0da}
+.signal{font-size:12px;line-height:1.5;color:#c5ced8}
+.winloss{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.win{background:#123c35;border-color:#1b7565;color:#8ce3d2}.loss{background:#421d22;border-color:#8b343d;color:#ff9ba1}
+.statsgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.stat{background:#151c25;padding:9px;border-radius:6px}.stat b{display:block;font-size:18px;margin-top:4px}
+.history{max-height:130px;overflow:auto;font-size:11px;color:var(--muted);line-height:1.7}
+#textInput{width:100%;background:#0b0e11;color:white;border:1px solid var(--line);padding:8px;border-radius:5px;margin:6px 0}
+.notice{font-size:10px;line-height:1.5;color:#9aa7b5}
+@media(max-width:850px){.app{grid-template-columns:1fr}.main{border-right:0}#chartWrap{height:58vh;min-height:350px}.sidebar{border-top:1px solid var(--line)}}
+@media(max-width:500px){header{padding:0 10px}.brand{font-size:16px}.toolbar{gap:5px;padding:7px}.toolbar button{padding:7px 8px;font-size:11px}#chartWrap{height:55vh}}
 </style>
 </head>
 <body>
-
-<header class="topbar">
- <div>
-  <div class="logo">XAU/USD</div>
-  <div class="instrument">Gold / US Dollar</div>
- </div>
- <div class="price-box">
-  <div class="price" id="price">---</div>
-  <div class="change" id="change">Ожидание данных</div>
- </div>
+<header>
+ <div><div class="brand">XAU/USD <span style="color:#8290a0;font-weight:400">PRO</span></div><div class="sub">Gold / US Dollar · Twelve Data</div></div>
+ <div class="quote"><strong id="livePrice">—</strong><small id="quoteChange">Ожидание котировок</small></div>
 </header>
 
-<div class="toolbar" id="timeframes">
- <button data-tf="1min" class="active">1m</button>
- <button data-tf="5min">5m</button>
- <button data-tf="15min">15m</button>
- <button data-tf="30min">30m</button>
- <button data-tf="1h">1H</button>
- <button data-tf="4h">4H</button>
- <button data-tf="1day">1D</button>
- <div class="separator"></div>
- <button id="fitButton">Весь график</button>
-</div>
+<div class="app">
+ <section class="main">
+  <div class="toolbar" id="timeframes">
+   <span class="group-label">ТФ</span>
+   <button data-tf="1min" class="active">1m</button><button data-tf="5min">5m</button><button data-tf="15min">15m</button><button data-tf="30min">30m</button><button data-tf="1h">1H</button><button data-tf="4h">4H</button><button data-tf="1day">1D</button>
+   <span class="group-label">РИСОВАНИЕ</span>
+   <button data-tool="cursor" class="active">Курсор</button>
+   <button data-tool="trend">Тренд</button>
+   <button data-tool="horizontal">Горизонталь</button>
+   <button data-tool="rectangle">Зона</button>
+   <button data-tool="fib">Fibonacci</button>
+   <button data-tool="text">Текст</button>
+   <button data-tool="measure">Измерение</button>
+   <button id="undo">Отменить</button><button id="deleteSelected">Удалить выбранное</button><button id="clearDrawings">Очистить</button><button id="fit">Весь график</button>
+  </div>
+  <div id="chartWrap"><div id="chart"></div><canvas id="drawLayer"></canvas></div>
+  <div class="status"><span id="status">Подключение…</span><span id="updated">—</span></div>
+ </section>
 
-<div class="statusbar">
- <div class="status-left">
-  <span class="dot" id="statusDot"></span>
-  <span id="status">Подключение к Twelve Data...</span>
- </div>
- <span id="lastUpdate">--:--:--</span>
-</div>
+ <aside class="sidebar">
+  <div class="card">
+   <h3>РЫНОЧНЫЙ УКЛОН · РАСЧЁТНАЯ ОЦЕНКА</h3>
+   <div class="biasrow"><span style="color:var(--green)">LONG <b id="longPct">50%</b></span><span style="color:var(--red)">SHORT <b id="shortPct">50%</b></span></div>
+   <div class="biasbar"><div id="longBar"></div><div id="shortBar"></div></div>
+   <div class="metric"><span>Текущий сигнал</span><b id="biasLabel">Нейтрально</b></div>
+   <div class="metric"><span>Сила сигналов</span><b id="strength">—</b></div>
+   <div class="metric"><span>RSI (14)</span><b id="rsi">—</b></div>
+   <div class="metric"><span>EMA 20 / 50</span><b id="emaState">—</b></div>
+   <div class="metric"><span>Структура</span><b id="structure">—</b></div>
+   <p class="signal" id="analysisText">Ожидание достаточного количества свечей для анализа.</p>
+   <p class="notice">Это алгоритмический индикаторный рейтинг, а не ИИ и не реальная вероятность сделки. Не является прогнозом или гарантией результата.</p>
+  </div>
 
-<div id="chart"></div>
+  <div class="card">
+   <h3>ЖУРНАЛ СДЕЛОК · WIN RATE</h3>
+   <div class="winloss">
+    <button class="win" id="addWin">+ WIN</button>
+    <button class="loss" id="addLoss">+ LOSS</button>
+   </div>
+   <div class="statsgrid">
+    <div class="stat"><span class="muted">Всего</span><b id="total">0</b></div>
+    <div class="stat"><span class="muted">Win rate</span><b id="winrate">0%</b></div>
+    <div class="stat"><span class="muted">Победы</span><b id="wins" style="color:var(--green)">0</b></div>
+    <div class="stat"><span class="muted">Поражения</span><b id="losses" style="color:var(--red)">0</b></div>
+   </div>
+   <div style="display:flex;justify-content:space-between;margin-top:10px">
+    <button id="undoTrade">Отменить последнюю</button><button id="resetStats">Сбросить</button>
+   </div>
+   <div class="history" id="tradeHistory" style="margin-top:8px">Пока нет записей.</div>
+  </div>
+
+  <div class="card">
+   <h3>ИНСТРУМЕНТЫ</h3>
+   <p class="notice">Выбери инструмент сверху, затем нажми или протяни мышью по графику. Для текста выбери «Текст» и нажми на нужное место. Выбранный объект можно удалить клавишей Delete/Backspace.</p>
+   <p class="notice" style="margin-top:8px">На телефоне: выбери инструмент и проведи пальцем по графику. Для перемещения графика переключись на «Курсор».</p>
+  </div>
+ </aside>
+</div>
 
 <script>
+/* Вставлен API-ключ, который пользователь передал в чате.
+   Для безопасности рекомендуется отозвать его и создать новый. */
 const API_KEY = "0ec885e9044e459d92e9b6cb646eb3c7";
 const API_URL = "https://api.twelvedata.com/time_series";
 const SYMBOL = "XAU/USD";
-const UPDATE_INTERVAL = 15000;
+const REFRESH_MS = 15000;
 
-const chartElement = document.getElementById("chart");
-
-const chart = LightweightCharts.createChart(chartElement,{
- width:chartElement.clientWidth,
- height:chartElement.clientHeight,
- layout:{
-  background:{color:"#0b0e11"},
-  textColor:"#d1d4dc",
-  fontSize:12
- },
- grid:{
-  vertLines:{color:"#171c23"},
-  horzLines:{color:"#171c23"}
- },
+const chartEl=document.getElementById('chart');
+const wrap=document.getElementById('chartWrap');
+const canvas=document.getElementById('drawLayer');
+const ctx=canvas.getContext('2d');
+const chart=LightweightCharts.createChart(chartEl,{
+ layout:{background:{color:'#0b0e11'},textColor:'#c8d1dc',fontSize:12},
+ grid:{vertLines:{color:'#171e27'},horzLines:{color:'#171e27'}},
  crosshair:{mode:LightweightCharts.CrosshairMode.Normal},
- rightPriceScale:{
-  borderColor:"#303844",
-  scaleMargins:{top:0.1,bottom:0.1}
- },
- timeScale:{
-  borderColor:"#303844",
-  timeVisible:true,
-  secondsVisible:false,
-  rightOffset:8,
-  barSpacing:8
- },
- handleScroll:true,
- handleScale:true
+ rightPriceScale:{borderColor:'#303844',scaleMargins:{top:.08,bottom:.08}},
+ timeScale:{borderColor:'#303844',timeVisible:true,secondsVisible:false,rightOffset:7,barSpacing:8},
+ handleScroll:true,handleScale:true
 });
-
-const candleSeries = chart.addCandlestickSeries({
- upColor:"#26a69a",
- downColor:"#ef5350",
- borderUpColor:"#26a69a",
- borderDownColor:"#ef5350",
- wickUpColor:"#26a69a",
- wickDownColor:"#ef5350",
- priceLineVisible:true,
- lastValueVisible:true
+const series=chart.addCandlestickSeries({
+ upColor:'#26a69a',downColor:'#ef5350',borderUpColor:'#26a69a',
+ borderDownColor:'#ef5350',wickUpColor:'#26a69a',wickDownColor:'#ef5350'
 });
+let tf='1min',timer=null,loading=false,candleData=[],drawings=[],selected=-1,tool='cursor',draft=null;
+let trades=[];
 
-let currentTimeframe = "1min";
-let updateTimer = null;
-let isLoading = false;
-
-const priceElement = document.getElementById("price");
-const changeElement = document.getElementById("change");
-const statusElement = document.getElementById("status");
-const statusDot = document.getElementById("statusDot");
-const lastUpdateElement = document.getElementById("lastUpdate");
-
-function setStatus(message,type){
- statusElement.textContent=message;
- statusDot.className="dot";
- if(type==="connected") statusDot.classList.add("connected");
- if(type==="error") statusDot.classList.add("error");
+function setStatus(s,error=false){document.getElementById('status').textContent=s;document.getElementById('status').style.color=error?'#ef5350':'#8b98a8'}
+function parseTime(s){let v=s.includes('T')?s:s.replace(' ','T');let n=Date.parse(v);return Number.isFinite(n)?Math.floor(n/1000):NaN}
+function resizeCanvas(){let r=wrap.getBoundingClientRect(),d=window.devicePixelRatio||1;canvas.width=Math.round(r.width*d);canvas.height=Math.round(r.height*d);canvas.style.width=r.width+'px';canvas.style.height=r.height+'px';ctx.setTransform(d,0,0,d,0,0);drawAll()}
+function xy(obj){let x=chart.timeScale().timeToCoordinate(obj.t),y=series.priceToCoordinate(obj.p);return x==null||y==null?null:{x,y}}
+function priceAt(y){return series.coordinateToPrice(y)}
+function timeAt(x){return chart.timeScale().coordinateToTime(x)}
+function drawLine(a,b,color,width=1,dash=[]){ctx.beginPath();ctx.setLineDash(dash);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.setLineDash([])}
+function drawAll(){
+ const w=wrap.clientWidth,h=wrap.clientHeight;ctx.clearRect(0,0,w,h);
+ drawings.forEach((d,i)=>{
+  let a=xy(d.a);if(!a)return;let color=i===selected?'#ffffff':(d.color||'#e7b84b');
+  if(d.type==='horizontal'){drawLine({x:0,y:a.y},{x:w,y:a.y},color,1,[5,4]);ctx.fillStyle=color;ctx.fillText(d.p.toFixed(2),w-65,a.y-5)}
+  if(d.type==='trend'||d.type==='measure'){let b=xy(d.b);if(!b)return;drawLine(a,b,color,2,d.type==='measure'?[4,4]:[]);if(d.type==='measure'){let diff=d.b.p-d.a.p;ctx.fillStyle=color;ctx.fillText((diff>=0?'+':'')+diff.toFixed(2), (a.x+b.x)/2,(a.y+b.y)/2-8)}}
+  if(d.type==='rectangle'){let b=xy(d.b);if(!b)return;ctx.fillStyle='rgba(231,184,75,.12)';ctx.strokeStyle=color;ctx.lineWidth=1;ctx.fillRect(a.x,a.y,b.x-a.x,b.y-a.y);ctx.strokeRect(a.x,a.y,b.x-a.x,b.y-a.y)}
+  if(d.type==='fib'){let b=xy(d.b);if(!b)return;let levels=[0,.236,.382,.5,.618,.786,1];levels.forEach(l=>{let y=a.y+(b.y-a.y)*l;drawLine({x:Math.min(a.x,b.x),y},{x:Math.max(a.x,b.x),y},color,1,[4,3]);ctx.fillStyle=color;ctx.fillText((l*100).toFixed(1)+'%',Math.max(a.x,b.x)+5,y-3)})}
+  if(d.type==='text'){ctx.fillStyle=color;ctx.font='bold 14px Arial';ctx.fillText(d.text||'Текст',a.x,a.y)}
+  if(i===selected){ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(a.x,a.y,4,0,Math.PI*2);ctx.fill()}
+ });
+ if(draft){let a=xy(draft.a),b=xy(draft.b);if(a&&b){drawLine(a,b,'#fff',1,[3,3]);}}
 }
-
-function parseApiDate(value){
- const normalized=value.includes("T")?value:value.replace(" ","T");
- const timestamp=Date.parse(normalized);
- return Number.isFinite(timestamp)?Math.floor(timestamp/1000):NaN;
-}
-
-function updatePrice(last,first){
- priceElement.textContent=last.close.toFixed(2);
- priceElement.style.color=last.close>=last.open?"#26a69a":"#ef5350";
-
- if(first && first.open!==0){
-  const percent=((last.close-first.open)/first.open)*100;
-  changeElement.textContent=(percent>=0?"+":"")+percent.toFixed(2)+"%";
-  changeElement.style.color=percent>=0?"#26a69a":"#ef5350";
- }
-}
+function nearestDrawing(x,y){let best=-1,dist=18;drawings.forEach((d,i)=>{let a=xy(d.a);if(!a)return;let dd=Math.hypot(a.x-x,a.y-y);if(dd<dist){dist=dd;best=i}if(d.b){let b=xy(d.b);if(b){dd=Math.hypot(b.x-x,b.y-y);if(dd<dist){dist=dd;best=i}}}});return best}
+function pointerPos(e){let r=canvas.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
+let drawingPointer=false;
+canvas.addEventListener('pointerdown',e=>{
+ if(tool==='cursor'){selected=nearestDrawing(...Object.values(pointerPos(e)));drawAll();return}
+ const p=pointerPos(e),t=timeAt(p.x),price=priceAt(p.y);if(t==null||price==null)return;
+ canvas.setPointerCapture(e.pointerId);
+ if(tool==='text'){let text=prompt('Текст на графике:');if(text){drawings.push({type:'text',a:{t,p:price},text,color:'#f4d06f'});selected=drawings.length-1;drawAll()}return}
+ if(tool==='horizontal'){drawings.push({type:'horizontal',a:{t,p:price},p:price});selected=drawings.length-1;drawAll();return}
+ draft={type:tool,a:{t,p:price},b:{t,p:price}};drawingPointer=true;
+});
+canvas.addEventListener('pointermove',e=>{
+ if(!drawingPointer||!draft)return;
+ const p=pointerPos(e),t=timeAt(p.x),price=priceAt(p.y);if(t==null||price==null)return;
+ draft.b={t,p:price};drawAll();
+});
+canvas.addEventListener('pointerup',()=>{
+ if(!drawingPointer||!draft)return;
+ drawings.push(draft);selected=drawings.length-1;draft=null;drawingPointer=false;drawAll();
+});
+canvas.addEventListener('pointercancel',()=>{draft=null;drawingPointer=false;drawAll()});
+function setTool(t){tool=t;document.querySelectorAll('[data-tool]').forEach(b=>b.classList.toggle('active',b.dataset.tool===t));canvas.style.cursor=t==='cursor'?'crosshair':'crosshair'}
+document.querySelectorAll('[data-tool]').forEach(b=>b.addEventListener('click',()=>setTool(b.dataset.tool)));
+document.getElementById('undo').onclick=()=>{drawings.pop();selected=-1;drawAll()};
+document.getElementById('deleteSelected').onclick=()=>{if(selected>=0){drawings.splice(selected,1);selected=-1;drawAll()}};
+document.getElementById('clearDrawings').onclick=()=>{if(confirm('Удалить все рисунки?')){drawings=[];selected=-1;drawAll()}};
+document.addEventListener('keydown',e=>{if((e.key==='Delete'||e.key==='Backspace')&&selected>=0){drawings.splice(selected,1);selected=-1;drawAll()}});
+document.getElementById('fit').onclick=()=>chart.timeScale().fitContent();
+chart.timeScale().subscribeVisibleTimeRangeChange(drawAll);
+chart.subscribeCrosshairMove(drawAll);
+new ResizeObserver(resizeCanvas).observe(wrap);
+window.addEventListener('resize',resizeCanvas);
 
 async function loadCandles(){
- if(isLoading)return;
- isLoading=true;
-
+ if(loading)return;loading=true;
  try{
-  setStatus("Загрузка котировок...","loading");
-
-  const params=new URLSearchParams({
-   symbol:SYMBOL,
-   interval:currentTimeframe,
-   outputsize:"500",
-   order:"asc",
-   apikey:API_KEY
-  });
-
-  const response=await fetch(API_URL+"?"+params.toString());
-  if(!response.ok)throw new Error("HTTP ошибка: "+response.status);
-
-  const data=await response.json();
-
-  if(data.status==="error" || data.code){
-   throw new Error(data.message||"Ошибка Twelve Data");
-  }
-
-  if(!data.values || !Array.isArray(data.values)){
-   throw new Error("API не вернул данные свечей");
-  }
-
-  const candles=data.values.map(item=>({
-   time:parseApiDate(item.datetime),
-   open:Number(item.open),
-   high:Number(item.high),
-   low:Number(item.low),
-   close:Number(item.close)
-  })).filter(item=>
-   Number.isFinite(item.time)&&
-   Number.isFinite(item.open)&&
-   Number.isFinite(item.high)&&
-   Number.isFinite(item.low)&&
-   Number.isFinite(item.close)
-  ).sort((a,b)=>a.time-b.time);
-
-  if(!candles.length)throw new Error("Нет корректных свечей");
-
-  candleSeries.setData(candles);
-
-  const last=candles[candles.length-1];
-  const first=candles[0];
-
-  updatePrice(last,first);
-  lastUpdateElement.textContent=new Date().toLocaleTimeString();
-
-  setStatus("Подключено • "+candles.length+" свечей","connected");
-
- }catch(error){
-  console.error("XAU/USD API:",error);
-  setStatus(error.message,"error");
- }finally{
-  isLoading=false;
- }
+  const q=new URLSearchParams({symbol:SYMBOL,interval:tf,outputsize:'500',order:'asc',apikey:API_KEY});
+  const res=await fetch(API_URL+'?'+q);const data=await res.json();
+  if(!res.ok||data.status==='error'||data.code)throw Error(data.message||'Ошибка API');
+  if(!Array.isArray(data.values))throw Error('API не вернул свечи');
+  const rows=data.values.map(v=>({time:parseTime(v.datetime),open:+v.open,high:+v.high,low:+v.low,close:+v.close}))
+   .filter(v=>Number.isFinite(v.time)&&[v.open,v.high,v.low,v.close].every(Number.isFinite))
+   .sort((a,b)=>a.time-b.time);
+  if(!rows.length)throw Error('Пустой набор свечей');
+  candleData=rows;series.setData(rows);
+  const last=rows[rows.length-1],first=rows[0];
+  document.getElementById('livePrice').textContent=last.close.toFixed(2);
+  document.getElementById('livePrice').style.color=last.close>=last.open?'#26a69a':'#ef5350';
+  let pct=(last.close-first.open)/first.open*100;
+  document.getElementById('quoteChange').textContent=(pct>=0?'+':'')+pct.toFixed(2)+'% за загруженный участок';
+  document.getElementById('updated').textContent='Обновлено '+new Date().toLocaleTimeString();
+  setStatus('Данные получены · '+rows.length+' свечей');
+  analyze(rows);drawAll();
+ }catch(err){setStatus(err.message,true);console.error(err)}
+ finally{loading=false}
 }
-
-function selectTimeframe(timeframe){
- currentTimeframe=timeframe;
-
- document.querySelectorAll("#timeframes button[data-tf]").forEach(button=>{
-  button.classList.toggle("active",button.dataset.tf===timeframe);
- });
-
- clearInterval(updateTimer);
- candleSeries.setData([]);
- loadCandles();
- updateTimer=setInterval(loadCandles,UPDATE_INTERVAL);
+function ema(values,period){let k=2/(period+1),out=[];values.forEach((v,i)=>out.push(i===0?v:v*k+out[i-1]*(1-k)));return out}
+function calcRSI(values,n=14){if(values.length<=n)return 50;let gains=0,losses=0;for(let i=values.length-n;i<values.length;i++){let d=values[i]-values[i-1];if(d>0)gains+=d;else losses-=d}if(losses===0)return 100;return 100-100/(1+gains/losses)}
+function analyze(rows){
+ if(rows.length<55){document.getElementById('analysisText').textContent='Нужно минимум 55 свечей для расчёта EMA 50.';return}
+ const closes=rows.map(x=>x.close),e20=ema(closes,20),e50=ema(closes,50),rsi=calcRSI(closes);
+ let score=0,notes=[];
+ if(e20.at(-1)>e50.at(-1)){score+=2;notes.push('EMA20 выше EMA50 — восходящий уклон')}else{score-=2;notes.push('EMA20 ниже EMA50 — нисходящий уклон')}
+ if(closes.at(-1)>e20.at(-1)){score+=1;notes.push('Цена выше EMA20')}else{score-=1;notes.push('Цена ниже EMA20')}
+ if(rsi>55){score+=1;notes.push('RSI поддерживает покупателей')}else if(rsi<45){score-=1;notes.push('RSI поддерживает продавцов')}else notes.push('RSI в нейтральной зоне');
+ const recent=rows.slice(-10),high=Math.max(...recent.map(x=>x.high)),low=Math.min(...recent.map(x=>x.low));
+ const last=rows.at(-1),body=Math.abs(last.close-last.open),range=Math.max(.000001,last.high-last.low);
+ if(last.close>last.open&&body/range>.6){score+=1;notes.push('Последняя свеча бычья с сильным телом')}
+ if(last.close<last.open&&body/range>.6){score-=1;notes.push('Последняя свеча медвежья с сильным телом')}
+ if(last.close>high-(high-low)*.15){score-=.5;notes.push('Цена близка к локальному сопротивлению')}
+ if(last.close<low+(high-low)*.15){score+=.5;notes.push('Цена близка к локальной поддержке')}
+ let long=Math.max(5,Math.min(95,Math.round(50+score*7)));
+ let short=100-long;
+ document.getElementById('longPct').textContent=long+'%';
+ document.getElementById('shortPct').textContent=short+'%';
+ document.getElementById('longBar').style.width=long+'%';
+ document.getElementById('shortBar').style.width=short+'%';
+ document.getElementById('biasLabel').textContent=long>=60?'Уклон LONG':short>=60?'Уклон SHORT':'Нейтрально';
+ document.getElementById('strength').textContent=Math.abs(score)>=3?'Выраженный':Math.abs(score)>=1.5?'Умеренный':'Слабый';
+ document.getElementById('rsi').textContent=rsi.toFixed(1);
+ document.getElementById('emaState').textContent=e20.at(-1)>e50.at(-1)?'Bullish':'Bearish';
+ document.getElementById('structure').textContent=last.close>high-(high-low)*.2?'У верхней границы':last.close<low+(high-low)*.2?'У нижней границы':'В диапазоне';
+ document.getElementById('analysisText').textContent=notes.join('. ')+'. Оценка пересчитывается после каждого успешного обновления данных.';
 }
+function renderTrades(){
+ const wins=trades.filter(x=>x==='W').length,losses=trades.length-wins;
+ document.getElementById('total').textContent=trades.length;
+ document.getElementById('wins').textContent=wins;
+ document.getElementById('losses').textContent=losses;
+ document.getElementById('winrate').textContent=trades.length?Math.round(wins/trades.length*100)+'%':'0%';
+ document.getElementById('tradeHistory').innerHTML=trades.length?trades.slice().reverse().map((x,i)=>'<div style="color:'+(x==='W'?'#26a69a':'#ef5350')+'">'+(trades.length-i)+'. '+(x==='W'?'WIN':'LOSS')+'</div>').join(''):'Пока нет записей.';
+}
+document.getElementById('addWin').onclick=()=>{trades.push('W');renderTrades()};
+document.getElementById('addLoss').onclick=()=>{trades.push('L');renderTrades()};
+document.getElementById('undoTrade').onclick=()=>{trades.pop();renderTrades()};
+document.getElementById('resetStats').onclick=()=>{if(confirm('Сбросить статистику?')){trades=[];renderTrades()}};
 
-document.querySelectorAll("#timeframes button[data-tf]").forEach(button=>{
- button.addEventListener("click",()=>selectTimeframe(button.dataset.tf));
-});
-
-document.getElementById("fitButton").addEventListener("click",()=>{
- chart.timeScale().fitContent();
-});
-
-const resizeObserver=new ResizeObserver(()=>{
- chart.applyOptions({
-  width:chartElement.clientWidth,
-  height:chartElement.clientHeight
- });
-});
-
-resizeObserver.observe(chartElement);
-
-selectTimeframe("1min");
+function selectTF(value){
+ tf=value;document.querySelectorAll('[data-tf]').forEach(b=>b.classList.toggle('active',b.dataset.tf===value));
+ clearInterval(timer);series.setData([]);loadCandles();timer=setInterval(loadCandles,REFRESH_MS);
+}
+document.querySelectorAll('[data-tf]').forEach(b=>b.addEventListener('click',()=>selectTF(b.dataset.tf)));
+resizeCanvas();renderTrades();selectTF('1min');
 </script>
 </body>
 </html>
