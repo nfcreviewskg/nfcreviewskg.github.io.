@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>XAU/USD — Gold Chart</title>
+
 <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
 
 <style>
@@ -113,9 +114,11 @@ html,body{height:100%;overflow:hidden;background:#131722;color:#d1d4dc;font-fami
 </div>
 
 <div id="backdrop"></div>
+
 <div id="tfSheet">
  <button class="close" id="tfClose">✕</button>
  <div class="grab"></div>
+
  <div class="tfGrid">
   <button data-tf="1m">1m</button>
   <button data-tf="5m">5m</button>
@@ -133,23 +136,23 @@ html,body{height:100%;overflow:hidden;background:#131722;color:#d1d4dc;font-fami
 
 const $ = id => document.getElementById(id);
 
-let tf = '1h';
-let tool = 'cursor';
-let drawings = [];
-let current = null;
+let tf='1h';
+let tool='cursor';
+let drawings=[];
+let current=null;
 
-let chart, candles, overlay, ctx;
-let lastBars = [];
+let chart,candles,overlay,ctx;
+let lastBars=[];
 
-let requestController = null;
-let requestId = 0;
-let pollTimer = null;
-let isLoading = false;
-let firstLoad = true;
+let requestController=null;
+let requestId=0;
+let pollTimer=null;
+let isLoading=false;
+let firstLoad=true;
 
-const API = 'https://biquote.io/api/XAUUSD/ohlc';
+const API='https://biquote.io/api/XAUUSD/ohlc';
 
-const labels = {
+const labels={
  '1m':'1m',
  '5m':'5m',
  '15m':'15m',
@@ -159,7 +162,7 @@ const labels = {
  '1d':'1D'
 };
 
-/* ================= CHART ================= */
+/* CHART */
 
 function initChart(){
 
@@ -168,10 +171,7 @@ function initChart(){
   return false;
  }
 
- chart = LightweightCharts.createChart($('mainChart'),{
-
-  width:$('mainChart').clientWidth,
-  height:$('mainChart').clientHeight,
+ chart=LightweightCharts.createChart($('mainChart'),{
 
   layout:{
    background:{color:'#131722'},
@@ -228,50 +228,49 @@ function initChart(){
 
  });
 
- candles = chart.addCandlestickSeries({
+ candles=chart.addCandlestickSeries({
 
   upColor:'#26a69a',
   downColor:'#ef5350',
-
   borderUpColor:'#26a69a',
   borderDownColor:'#ef5350',
-
   wickUpColor:'#26a69a',
   wickDownColor:'#ef5350'
 
  });
 
- overlay = $('overlay');
- ctx = overlay.getContext('2d');
+ overlay=$('overlay');
+ ctx=overlay.getContext('2d');
 
  chart.timeScale().subscribeVisibleLogicalRangeChange(redraw);
 
  return true;
 }
 
-/* ================= DATA ================= */
+/* DATA PARSING */
 
 function parseTime(k){
 
- const raw = k.openTime ?? k.time ?? k.t;
+ const raw=k.openTime??k.time??k.t;
 
- if(typeof raw === 'string'){
-  const parsed = Date.parse(raw);
+ if(typeof raw==='string'){
+  const parsed=Date.parse(raw);
+
   if(!Number.isNaN(parsed)){
    return Math.floor(parsed/1000);
   }
  }
 
- const n = Number(raw);
+ const n=Number(raw);
 
- if(!Number.isFinite(n)) return null;
+ if(!Number.isFinite(n))return null;
 
- return Math.floor(n > 1e12 ? n/1000 : n);
+ return Math.floor(n>1e12?n/1000:n);
 }
 
 function normalizeBars(data){
 
- let source = [];
+ let source=[];
 
  if(Array.isArray(data)){
   source=data;
@@ -280,26 +279,26 @@ function normalizeBars(data){
  }else if(Array.isArray(data.data)){
   source=data.data;
  }else{
-  throw new Error(data.message || data.error || 'Нет массива свечей');
+  throw new Error(data.message||data.error||'Нет массива свечей');
  }
 
- const result = source.map(k=>{
+ const result=source.map(k=>{
 
   const time=parseTime(k);
 
-  const open=Number(k.open ?? k.o);
-  const high=Number(k.high ?? k.h);
-  const low=Number(k.low ?? k.l);
-  const close=Number(k.close ?? k.c);
+  const open=Number(k.open??k.o);
+  const high=Number(k.high??k.h);
+  const low=Number(k.low??k.l);
+  const close=Number(k.close??k.c);
 
   if(
-   time===null ||
-   ![open,high,low,close].every(Number.isFinite) ||
-   open<=0 || high<=0 || low<=0 || close<=0 ||
-   high<low ||
-   high<Math.max(open,close) ||
+   time===null||
+   ![open,high,low,close].every(Number.isFinite)||
+   open<=0||high<=0||low<=0||close<=0||
+   high<low||
+   high<Math.max(open,close)||
    low>Math.min(open,close)
-  ) return null;
+  )return null;
 
   return {time,open,high,low,close};
 
@@ -307,39 +306,35 @@ function normalizeBars(data){
 
  result.sort((a,b)=>a.time-b.time);
 
- const unique = new Map();
+ const unique=new Map();
 
- result.forEach(bar=>{
-  unique.set(bar.time,bar);
- });
+ result.forEach(bar=>unique.set(bar.time,bar));
 
  return Array.from(unique.values());
 }
 
+/* FETCH WITH 10 SECOND TIMEOUT */
+
 async function fetchBars(){
 
- if(isLoading) return;
+ if(isLoading)return;
 
  isLoading=true;
 
  const myId=++requestId;
 
- if(requestController){
-  requestController.abort();
- }
+ const controller=new AbortController();
+ requestController=controller;
 
- requestController=new AbortController();
+ const timeout=setTimeout(()=>{
+  controller.abort();
+ },10000);
 
- const controller=requestController;
-
- const url =
-  `${API}?interval=${encodeURIComponent(tf)}&limit=500`;
-
- if(firstLoad){
-  $('status').textContent='Загрузка XAU/USD...';
- }
+ $('status').textContent='Загрузка XAU/USD...';
 
  try{
+
+  const url=`${API}?interval=${encodeURIComponent(tf)}&limit=500`;
 
   const response=await fetch(url,{
    method:'GET',
@@ -353,12 +348,12 @@ async function fetchBars(){
 
   const data=await response.json();
 
-  if(myId!==requestId) return;
+  if(myId!==requestId)return;
 
   const bars=normalizeBars(data);
 
   if(!bars.length){
-   throw new Error('API не вернул корректные свечи');
+   throw new Error('Нет данных свечей');
   }
 
   lastBars=bars;
@@ -381,14 +376,20 @@ async function fetchBars(){
 
  }catch(error){
 
-  if(error.name==='AbortError') return;
+  if(myId!==requestId)return;
+
+  $('status').textContent=
+   error.name==='AbortError'
+   ?'Тайм-аут: сервер не ответил за 10 секунд'
+   :'Ошибка: '+error.message;
+
+  $('status').style.color='#ef5350';
 
   console.error('XAU/USD:',error);
 
-  $('status').textContent='Ошибка: '+error.message;
-  $('status').style.color='#ef5350';
-
  }finally{
+
+  clearTimeout(timeout);
 
   if(myId===requestId){
    isLoading=false;
@@ -398,14 +399,13 @@ async function fetchBars(){
 
 }
 
-/* ================= TIMEFRAMES ================= */
+/* TIMEFRAMES */
 
 function selectTf(value){
 
- if(!labels[value] || value===tf) return;
+ if(!labels[value]||value===tf)return;
 
  tf=value;
-
  firstLoad=true;
 
  document.querySelectorAll('[data-tf]').forEach(b=>{
@@ -421,32 +421,27 @@ function selectTf(value){
  isLoading=false;
 
  fetchBars();
-
  resetPoll();
 
 }
 
-/* ================= POLLING ================= */
+/* AUTO UPDATE */
 
 function resetPoll(){
 
- if(pollTimer) clearInterval(pollTimer);
+ if(pollTimer)clearInterval(pollTimer);
 
  pollTimer=setInterval(()=>{
-
-  if(!isLoading){
-   fetchBars();
-  }
-
+  if(!isLoading)fetchBars();
  },15000);
 
 }
 
-/* ================= DRAWING ================= */
+/* DRAWING */
 
 function redraw(){
 
- if(!ctx || !chart) return;
+ if(!ctx||!chart)return;
 
  const w=overlay.width/(devicePixelRatio||1);
  const h=overlay.height/(devicePixelRatio||1);
@@ -455,14 +450,14 @@ function redraw(){
 
  drawings.forEach(d=>drawShape(d,false));
 
- if(current) drawShape(current,true);
+ if(current)drawShape(current,true);
 
 }
 
 function drawShape(d,preview){
 
  const color=preview?
-  'rgba(255,184,0,0.9)':'#ffb800';
+ 'rgba(255,184,0,0.9)':'#ffb800';
 
  ctx.strokeStyle=color;
  ctx.fillStyle=color;
@@ -476,7 +471,7 @@ function drawShape(d,preview){
 
   const y=candles.priceToCoordinate(d.p1.price);
 
-  if(y==null) return;
+  if(y==null)return;
 
   ctx.beginPath();
   ctx.moveTo(0,y);
@@ -499,7 +494,7 @@ function drawShape(d,preview){
  const x2=ts.timeToCoordinate(d.p2.time);
  const y2=candles.priceToCoordinate(d.p2.price);
 
- if([x1,y1,x2,y2].some(v=>v==null)) return;
+ if([x1,y1,x2,y2].some(v=>v==null))return;
 
  if(d.type==='trend'){
 
@@ -534,12 +529,11 @@ function drawShape(d,preview){
 
   levels.forEach(level=>{
 
-   const price=
-    d.p1.price+(d.p2.price-d.p1.price)*level;
+   const price=d.p1.price+(d.p2.price-d.p1.price)*level;
 
    const y=candles.priceToCoordinate(price);
 
-   if(y==null) return;
+   if(y==null)return;
 
    ctx.strokeStyle=
     level===0||level===1?
@@ -553,7 +547,7 @@ function drawShape(d,preview){
    ctx.fillStyle='#ffb800';
 
    ctx.fillText(
-    `${(level*100).toFixed(1)}%  ${price.toFixed(2)}`,
+    `${(level*100).toFixed(1)}% ${price.toFixed(2)}`,
     left+4,
     y-4
    );
@@ -573,7 +567,7 @@ function drawShape(d,preview){
 
 }
 
-/* ================= POINTER ================= */
+/* POINTER */
 
 function getPoint(e){
 
@@ -585,7 +579,7 @@ function getPoint(e){
  const time=chart.timeScale().coordinateToTime(x);
  const price=candles.coordinateToPrice(y);
 
- if(time===null || time===undefined || price===null || price===undefined){
+ if(time===null||time===undefined||price===null||price===undefined){
   return null;
  }
 
@@ -595,13 +589,13 @@ function getPoint(e){
 
 function startDraw(e){
 
- if(tool==='cursor') return;
+ if(tool==='cursor')return;
 
- if(e.pointerType==='mouse' && e.button!==0) return;
+ if(e.pointerType==='mouse'&&e.button!==0)return;
 
  const p=getPoint(e);
 
- if(!p) return;
+ if(!p)return;
 
  e.preventDefault();
 
@@ -611,11 +605,7 @@ function startDraw(e){
 
  if(tool==='horiz'){
 
-  drawings.push({
-   type:'horiz',
-   p1:p
-  });
-
+  drawings.push({type:'horiz',p1:p});
   redraw();
   return;
 
@@ -633,7 +623,7 @@ function startDraw(e){
 
 function moveDraw(e){
 
- if(!current) return;
+ if(!current)return;
 
  e.preventDefault();
 
@@ -648,14 +638,13 @@ function moveDraw(e){
 
 function endDraw(e){
 
- if(!current) return;
+ if(!current)return;
 
  const p=getPoint(e);
 
- if(p) current.p2=p;
+ if(p)current.p2=p;
 
  drawings.push(current);
-
  current=null;
 
  redraw();
@@ -667,7 +656,7 @@ overlay.addEventListener('pointermove',moveDraw);
 overlay.addEventListener('pointerup',endDraw);
 overlay.addEventListener('pointercancel',endDraw);
 
-/* ================= TOOL SELECT ================= */
+/* TOOL SELECT */
 
 function selectTool(t){
 
@@ -688,12 +677,10 @@ document.querySelectorAll('[data-tool]').forEach(b=>{
   const t=b.dataset.tool;
 
   if(t==='clear'){
-
    drawings=[];
    current=null;
    redraw();
    return;
-
   }
 
   selectTool(t);
@@ -702,7 +689,7 @@ document.querySelectorAll('[data-tool]').forEach(b=>{
 
 });
 
-/* ================= MOBILE SHEET ================= */
+/* MOBILE TIMEFRAME MENU */
 
 function openSheet(){
 
@@ -719,9 +706,7 @@ function closeSheet(){
 }
 
 $('tfToggle').addEventListener('click',openSheet);
-
 $('backdrop').addEventListener('click',closeSheet);
-
 $('tfClose').addEventListener('click',closeSheet);
 
 document.querySelectorAll('#tfSheet [data-tf]').forEach(b=>{
@@ -735,7 +720,7 @@ document.querySelectorAll('#tfSheet [data-tf]').forEach(b=>{
 
 });
 
-/* ================= DESKTOP TF ================= */
+/* DESKTOP TIMEFRAME MENU */
 
 document.querySelectorAll('#tfRow [data-tf]').forEach(b=>{
 
@@ -745,18 +730,18 @@ document.querySelectorAll('#tfRow [data-tf]').forEach(b=>{
 
 });
 
-/* ================= RESIZE ================= */
+/* RESIZE */
 
 function resize(){
 
- if(!chart) return;
+ if(!chart)return;
 
  const el=$('mainChart');
 
  const w=el.clientWidth;
  const h=el.clientHeight;
 
- if(w<=0||h<=0) return;
+ if(w<=0||h<=0)return;
 
  chart.resize(w,h);
 
@@ -775,15 +760,16 @@ function resize(){
 }
 
 const resizeObserver=new ResizeObserver(resize);
+
 resizeObserver.observe($('charts'));
 
 window.addEventListener('resize',resize);
 
-/* ================= BOOT ================= */
+/* BOOT */
 
 function boot(){
 
- if(!initChart()) return;
+ if(!initChart())return;
 
  resize();
 
