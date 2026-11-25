@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>XAU/USD — Gold Chart</title>
+<script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:#131722;color:#d1d4dc;font-family:-apple-system,"Segoe UI",Roboto,sans-serif;font-size:13px}
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+
+/* ================= TOPBAR ================= */
+#topbar{display:flex;align-items:center;gap:8px;padding:0 10px;height:48px;background:#1e222d;border-bottom:1px solid #2a2e39;z-index:100;flex-shrink:0}
+#topbar .logo{font-weight:700;color:#ffb800;font-size:14px;letter-spacing:.5px;white-space:nowrap}
+#symbol{color:#ffb800;font-weight:600;font-size:14px;white-space:nowrap}
+#status{font-size:11px;color:#787b86;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-left:auto;max-width:40vw}
+#tfToggle{display:none;background:#2a2e39;color:#d1d4dc;border:1px solid #363a45;border-radius:4px;padding:6px 10px;font-size:12px;cursor:pointer;font-weight:600;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+
+/* desktop tf row */
+#tfRow{display:flex;gap:1px;background:#2a2e39;border-radius:4px;padding:2px;margin-left:8px}
+#tfRow button{background:transparent;color:#787b86;border:none;padding:5px 10px;cursor:pointer;border-radius:3px;font-size:12px;font-weight:500;font-family:inherit}
+#tfRow button:hover{color:#d1d4dc}
+#tfRow button.active{background:#ffb800;color:#131722}
+
+/* ================= MAIN ================= */
+#main{display:flex;flex:1;overflow:hidden;position:relative}
+
+/* left toolbar (desktop) */
+#leftbar{width:44px;background:#1e222d;border-right:1px solid #2a2e39;display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:3px;z-index:15;flex-shrink:0}
+#leftbar button{width:32px;height:32px;background:transparent;color:#787b86;border:none;border-radius:4px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;font-family:inherit}
+#leftbar button:hover{background:#2a2e39;color:#d1d4dc}
+#leftbar button.active{background:#ffb800;color:#131722}
+#leftbar .sep{width:20px;height:1px;background:#363a45;margin:4px 0}
+
+/* charts */
+#charts{flex:1;position:relative;background:#131722;min-width:0}
+#mainChart{position:absolute;inset:0}
+#overlay{position:absolute;top:0;left:0;z-index:10;pointer-events:none;touch-action:none}
+#overlay.draw{cursor:crosshair;pointer-events:auto}
+
+/* ================= MOBILE TOOLBAR (bottom) ================= */
+#bottomBar{display:none;height:52px;background:#1e222d;border-top:1px solid #2a2e39;flex-shrink:0;z-index:100;justify-content:space-around;align-items:center;padding:0 4px;padding-bottom:env(safe-area-inset-bottom)}
+#bottomBar button{flex:1;height:100%;background:transparent;color:#787b86;border:none;font-size:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-family:inherit;cursor:pointer;max-width:72px;touch-action:manipulation}
+#bottomBar button span{font-size:9px;font-weight:500;letter-spacing:.3px}
+#bottomBar button:hover,#bottomBar button.active{color:#ffb800}
+#bottomBar button.active span{color:#ffb800}
+
+/* ================= MOBILE TF SHEET ================= */
+#tfSheet{position:fixed;left:0;right:0;bottom:0;background:#1e222d;border-top:1px solid #363a45;border-radius:12px 12px 0 0;padding:16px 12px calc(16px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .25s ease;z-index:1000;box-shadow:0 -4px 20px rgba(0,0,0,.5);pointer-events:none}
+#tfSheet.open{transform:translateY(0);pointer-events:auto}
+#tfSheet .grab{width:36px;height:4px;background:#363a45;border-radius:2px;margin:0 auto 12px}
+#tfSheet .tfGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+#tfSheet .tfGrid button{background:#2a2e39;color:#d1d4dc;border:1px solid #363a45;border-radius:6px;padding:14px 0;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;touch-action:manipulation}
+#tfSheet .tfGrid button.active{background:#ffb800;color:#131722;border-color:#ffb800}
+#tfSheet .close{position:absolute;top:10px;right:14px;background:transparent;border:none;color:#787b86;font-size:20px;cursor:pointer;padding:8px;touch-action:manipulation}
+#backdrop{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:none}
+#backdrop.show{display:block}
+
+/* ================= MOBILE BREAKPOINT ================= */
+@media (max-width: 768px){
+  #topbar{height:52px;padding:0 8px;gap:6px}
+  #topbar .logo{font-size:13px}
+  #symbol{font-size:13px}
+  #status{display:none}
+  #tfRow{display:none}
+  #tfToggle{display:block}
+  #leftbar{display:none}
+  #bottomBar{display:flex}
+}
+
+/* hide mobile stuff on desktop */
+@media (min-width: 769px){
+  #bottomBar{display:none !important}
+  #tfSheet,#backdrop{display:none !important}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- ============ TOPBAR ============ -->
+  <div id="topbar">
+    <span class="logo">◈ Gold</span>
+    <span id="symbol">XAU/USD</span>
+    <div id="tfRow">
+      <button data-tf="1m">1m</button>
+      <button data-tf="5m">5m</button>
+      <button data-tf="15m">15m</button>
+      <button data-tf="30m">30m</button>
+      <button data-tf="1h" class="active">1H</button>
+      <button data-tf="4h">4H</button>
+      <button data-tf="1d">1D</button>
+    </div>
+    <button id="tfToggle">1H ▾</button>
+    <span id="status">загрузка...</span>
+  </div>
+
+  <!-- ============ MAIN ============ -->
+  <div id="main">
+    <div id="leftbar">
+      <button data-tool="cursor" class="active" title="Курсор">✥</button>
+      <div class="sep"></div>
+      <button data-tool="trend" title="Тренд">╱</button>
+      <button data-tool="horiz" title="Горизонталь">─</button>
+      <button data-tool="rect" title="Прямоугольник">▭</button>
+      <button data-tool="fib" title="Fibonacci">F</button>
+      <div class="sep"></div>
+      <button data-tool="clear" title="Очистить">🗑</button>
+    </div>
+    <div id="charts">
+      <div id="mainChart"></div>
+      <canvas id="overlay"></canvas>
+    </div>
+  </div>
+
+  <!-- ============ MOBILE BOTTOM BAR ============ -->
+  <div id="bottomBar">
+    <button data-tool="cursor" class="active"><span style="font-size:18px">✥</span><span>Курсор</span></button>
+    <button data-tool="trend"><span style="font-size:18px">╱</span><span>Тренд</span></button>
+    <button data-tool="horiz"><span style="font-size:18px">─</span><span>Гориз.</span></button>
+    <button data-tool="rect"><span style="font-size:18px">▭</span><span>Прямоуг.</span></button>
+    <button data-tool="fib"><span style="font-size:18px">F</span><span>Фибо</span></button>
+    <button data-tool="clear"><span style="font-size:18px">🗑</span><span>Очист.</span></button>
+  </div>
+</div>
+
+<!-- ============ MOBILE TF SHEET ============ -->
+<div id="backdrop"></div>
+<div id="tfSheet">
+  <button class="close" id="tfClose">✕</button>
+  <div class="grab"></div>
+  <div class="tfGrid">
+    <button data-tf="1m">1m</button>
+    <button data-tf="5m">5m</button>
+    <button data-tf="15m">15m</button>
+    <button data-tf="30m">30m</button>
+    <button data-tf="1h" class="active">1H</button>
+    <button data-tf="4h">4H</button>
+    <button data-tf="1d">1D</button>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+const $ = id => document.getElementById(id);
+
+let tf = '1h';
+let tool = 'cursor';
+let drawings = [], current = null;
+let chart, candles, overlay, ctx;
+let lastBars = [];
+let pollTimer = null;
+
+/* ================= DATA ================= */
+async function fetchBars(){
+  const url = `https://biquote.io/api/ohlc?symbol=XAUUSD&interval=${tf}&limit=500`;
+  try {
+    $('status').textContent = 'загрузка...';
+    const r = await fetch(url);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    const bars = (Array.isArray(data) ? data : data.bars || data.data || []).map(k => {
+      const tRaw = k.time ?? k.t;
+      const tNum = Number(tRaw);
+      const time = Math.floor(tNum > 1e12 ? tNum / 1000 : tNum);
+      return {
+        time,
+        open: +(k.open ?? k.o),
+        high: +(k.high ?? k.h),
+        low: +(k.low ?? k.l),
+        close: +(k.close ?? k.c)
+      };
+    }).filter(b => b.time && !isNaN(b.close));
+    bars.sort((a,b)=>a.time-b.time);
+    const seen = new Set();
+    lastBars = bars.filter(b => { if (seen.has(b.time)) return false; seen.add(b.time); return true; });
+    candles.setData(lastBars);
+    $('status').textContent = `OK · ${lastBars.length} баров · ${new Date().toLocaleTimeString()}`;
+    redraw();
+  } catch(e){
+    console.error(e);
+    $('status').textContent = 'ошибка: ' + e.message;
+  }
+}
+
+/* ================= CHART ================= */
+function initChart(){
+  chart = LightweightCharts.createChart($('mainChart'), {
+    layout:{ background:{color:'#131722'}, textColor:'#d1d4dc', fontSize:11 },
+    grid:{ vertLines:{color:'#1e222d'}, horzLines:{color:'#1e222d'} },
+    crosshair:{ mode:LightweightCharts.CrosshairMode.Normal,
+      vertLine:{color:'#758696',width:1,style:2,labelBackgroundColor:'#363a45'},
+      horzLine:{color:'#758696',width:1,style:2,labelBackgroundColor:'#363a45'} },
+    rightPriceScale:{ borderColor:'#363a45', scaleMargins:{top:0.05,bottom:0.05} },
+    timeScale:{ borderColor:'#363a45', timeVisible:true, secondsVisible:false, rightOffset:6 }
+  });
+  candles = chart.addCandlestickSeries({
+    upColor:'#26a69a', downColor:'#ef5350',
+    borderUpColor:'#26a69a', borderDownColor:'#ef5350',
+    wickUpColor:'#26a69a', wickDownColor:'#ef5350'
+  });
+  overlay = $('overlay');
+  ctx = overlay.getContext('2d');
+  chart.timeScale().subscribeVisibleLogicalRangeChange(() => redraw());
+}
+
+/* ================= DRAWING ================= */
+function redraw(){
+  if (!ctx || !overlay) return;
+  const w = overlay.width / devicePixelRatio;
+  const h = overlay.height / devicePixelRatio;
+  ctx.clearRect(0,0,w,h);
+  for (const d of drawings) drawShape(d, false);
+  if (current) drawShape(current, true);
+}
+
+function drawShape(d, preview){
+  const color = preview ? 'rgba(255,184,0,0.9)' : '#ffb800';
+  ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 1.5;
+  ctx.font = '11px -apple-system,sans-serif';
+  const ts = chart.timeScale();
+  const w = overlay.width / devicePixelRatio;
+
+  if (d.type === 'horiz'){
+    const y = candles.priceToCoordinate(d.p1.price);
+    if (y == null) return;
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke();
+    const label = d.p1.price.toFixed(2);
+    ctx.fillRect(2, y-15, ctx.measureText(label).width+8, 13);
+    ctx.fillStyle = '#131722';
+    ctx.fillText(label, 6, y-5);
+    return;
+  }
+
+  const x1 = ts.timeToCoordinate(d.p1.time);
+  const y1 = candles.priceToCoordinate(d.p1.price);
+  const x2 = ts.timeToCoordinate(d.p2.time);
+  const y2 = candles.priceToCoordinate(d.p2.price);
+  if ([x1,y1,x2,y2].some(v => v == null)) return;
+
+  if (d.type === 'trend'){
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  } else if (d.type === 'rect'){
+    ctx.fillStyle = preview ? 'rgba(255,184,0,0.15)' : 'rgba(255,184,0,0.08)';
+    ctx.fillRect(x1,y1,x2-x1,y2-y1);
+    ctx.strokeRect(x1,y1,x2-x1,y2-y1);
+  } else if (d.type === 'fib'){
+    const left = Math.min(x1,x2), right = Math.max(x1,x2);
+    const levels = [0,0.236,0.382,0.5,0.618,0.786,1];
+    for (const lv of levels){
+      const price = d.p1.price + (d.p2.price - d.p1.price) * lv;
+      const y = candles.priceToCoordinate(price);
+      if (y == null) continue;
+      ctx.strokeStyle = lv === 0 || lv === 1 ? color : 'rgba(255,184,0,0.6)';
+      ctx.beginPath(); ctx.moveTo(left,y); ctx.lineTo(right,y); ctx.stroke();
+      ctx.fillStyle = color;
+      ctx.fillText(`${(lv*100).toFixed(1)}% ${price.toFixed(2)}`, left+4, y-3);
+    }
+    ctx.strokeStyle = color;
+    ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+}
+
+/* ================= POINTER (mouse + touch) ================= */
+function evtPoint(e){
+  const r = overlay.getBoundingClientRect();
+  let cx, cy;
+  if (e.touches && e.touches[0]){ cx = e.touches[0].clientX; cy = e.touches[0].clientY; }
+  else if (e.changedTouches && e.changedTouches[0]){ cx = e.changedTouches[0].clientX; cy = e.changedTouches[0].clientY; }
+  else { cx = e.clientX; cy = e.clientY; }
+  const x = cx - r.left, y = cy - r.top;
+  const time = chart.timeScale().coordinateToTime(x);
+  const price = candles.coordinateToPrice(y);
+  return (time && price) ? {time, price} : null;
+}
+
+function startDraw(e){
+  if (tool === 'cursor') return;
+  const p = evtPoint(e); if (!p) return;
+  if (e.cancelable) e.preventDefault();
+  if (tool === 'horiz'){ drawings.push({type:'horiz', p1:p}); redraw(); return; }
+  current = {type:tool, p1:p, p2:p};
+}
+function moveDraw(e){
+  if (!current) return;
+  if (e.cancelable) e.preventDefault();
+  const p = evtPoint(e); if (p){ current.p2 = p; redraw(); }
+}
+function endDraw(e){
+  if (!current) return;
+  const p = evtPoint(e); if (p) current.p2 = p;
+  if (current.p1 && current.p2) drawings.push(current);
+  current = null; redraw();
+}
+
+overlay.addEventListener('mousedown', startDraw);
+overlay.addEventListener('mousemove', moveDraw);
+overlay.addEventListener('mouseup', endDraw);
+overlay.addEventListener('mouseleave', endDraw);
+overlay.addEventListener('touchstart', startDraw, {passive:false});
+overlay.addEventListener('touchmove', moveDraw, {passive:false});
+overlay.addEventListener('touchend', endDraw);
+overlay.addEventListener('touchcancel', endDraw);
+
+/* ================= UI: TOOL SELECT ================= */
+function selectTool(t){
+  tool = t;
+  document.querySelectorAll('[data-tool]').forEach(b => b.classList.toggle('active', b.dataset.tool === t));
+  overlay.classList.toggle('draw', t !== 'cursor');
+}
+document.querySelectorAll('[data-tool]').forEach(b => {
+  b.addEventListener('click', () => {
+    const t = b.dataset.tool;
+    if (t === 'clear'){ drawings = []; current = null; redraw(); return; }
+    selectTool(t);
+  });
+});
+
+/* ================= UI: TF ================= */
+function selectTf(t){
+  tf = t;
+  document.querySelectorAll('[data-tf]').forEach(b => b.classList.toggle('active', b.dataset.tf === t));
+  const label = t === '1h' ? '1H' : t === '4h' ? '4H' : t === '1d' ? '1D' : t;
+  $('tfToggle').textContent = label + ' ▾';
+  fetchBars();
+  resetPoll();
+}
+
+/* десктоп: только кнопки внутри #tfRow */
+document.querySelectorAll('#tfRow [data-tf]').forEach(b => {
+  b.addEventListener('click', () => selectTf(b.dataset.tf));
+});
+
+/* ================= MOBILE SHEET ================= */
+function openSheet(){
+  $('tfSheet').classList.add('open');
+  $('backdrop').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+function closeSheet(){
+  $('tfSheet').classList.remove('open');
+  $('backdrop').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+const tfToggle = $('tfToggle');
+tfToggle.addEventListener('pointerdown', e => { e.preventDefault(); openSheet(); });
+tfToggle.addEventListener('click', e => { e.preventDefault(); });
+
+$('backdrop').addEventListener('pointerdown', e => { e.preventDefault(); closeSheet(); });
+$('tfClose').addEventListener('pointerdown', e => { e.preventDefault(); closeSheet(); });
+
+document.querySelectorAll('#tfSheet [data-tf]').forEach(b => {
+  b.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    const t = b.dataset.tf;
+    closeSheet();
+    selectTf(t);
+  });
+});
+
+/* ================= RESIZE ================= */
+function resize(){
+  const el = $('mainChart');
+  const w = el.clientWidth, h = el.clientHeight;
+  if (w > 0 && h > 0) chart.applyOptions({width:w, height:h});
+  const dpr = devicePixelRatio || 1;
+  overlay.width = w * dpr;
+  overlay.height = h * dpr;
+  overlay.style.width = w + 'px';
+  overlay.style.height = h + 'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  redraw();
+}
+
+/* ================= POLL ================= */
+function resetPoll(){
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(fetchBars, 15000);
+}
+
+/* ================= BOOT ================= */
+function boot(){
+  initChart();
+  resize();
+  window.addEventListener('resize', resize);
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', resize);
+  fetchBars();
+  resetPoll();
+}
+requestAnimationFrame(boot);
+})();
+</script>
+</body>
+</html>
